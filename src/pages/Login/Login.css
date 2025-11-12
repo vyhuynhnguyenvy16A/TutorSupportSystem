@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Container chính bao bọc toàn bộ trang */
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f7f6; 
+  overflow: hidden;
+}
+
+/* Bên trái: chứa ảnh */
+.login-left {
+  flex: 1; /* Chiếm 1 nửa */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.login-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bên phải: chứa form đăng nhập */
+.login-right {
+  flex: 1; /* Chiếm 1 nửa */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Form đăng nhập */
+.login-form {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1); 
+  width: 100%;
+  max-width: 400px; 
+  text-align: center;
+}
+
+.login-form h2 {
+  margin-bottom: 2rem; /* Tăng khoảng cách */
+  color: #333;
+  font-weight: 600;
+}
+
+.login-form label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  text-align: left;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hiệu ứng focus giống Register */
+.login-form input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* --- Style cho thông báo lỗi (Copy từ Register) --- */
+.error-message {
+  color: #dc3545;
+  font-size: 0.85rem;
+  text-align: left;
+  margin-top: 0.25rem;
+}
+
+/* Nút đăng nhập */
+.login-form button {
+  margin-top: 2rem; /* Tăng khoảng cách */
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.login-form button:hover {
+  background-color: #0056b3;
+}
+
+.login-form button:active {
+  transform: scale(0.98);
+}
+
+/* Thêm style cho nút khi bị disabled */
+.login-form button:disabled {
+  background-color: #a0cffc; /* Màu nhạt hơn */
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Link qua trang đăng ký */
+.login-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+  }
+
+  .login-left {
+    display: none; 
+  }
+
+  .login-right {
+    padding: 1.5rem;
+    width: 100%;
+  }
+
+  .login-form {
+    padding: 2rem;
+    max-width: none;
+    box-shadow: none;
+  }
+}
