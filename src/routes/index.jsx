@@ -9,7 +9,7 @@ import LoginPage from '../pages/Login/LoginPage.jsx';
 import ForgotPasswordPage from '../pages/ForgotPassword.jsx';
 import SchedulePage from '../pages/SchedulePage.jsx';
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
-
+import SettingsPage from '../pages/SettingsPage.jsx';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -30,7 +30,7 @@ const AppRoutes = () => {
       {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
       <Route path="/app/overview" element={<div>Trang Tổng Quan</div>} />
       <Route path="/app/register-schedule" element={<div>Trang Đăng Kí Lịch</div>} />
-      <Route path="/app/settings" element={<div>Trang Cài Đặt</div>} />
+      <Route path="/app/settings" element={<SettingsPage />} />
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
       
