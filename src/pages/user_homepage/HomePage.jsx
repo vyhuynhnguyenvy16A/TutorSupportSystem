@@ -1,21 +1,25 @@
 // src/pages/HomePage.jsx
 
 import React from 'react';
+import Navbar from '../../Components/Layout/Navbar.jsx';
+import Hero from '../../Components/Layout/Hero.jsx';
 
-import Header from '../../components/Header.jsx'; 
-import Hero from '../../components/Hero.jsx';
-import ProductList from '../../components/ProductList.jsx';
-import Footer from '../../components/Footer.jsx'
+// (Tùy chọn) import các section khác của trang chủ
+// import Features from '../../components/Features/Features';
+// import Footer from '../../components/Footer/Footer';
 
-function HomePage() {
+const HomePage = () => {
   return (
-    <div>
-      <main>
-        <Hero />       
-        <ProductList />
-      </main>
+    <div className="homepage">
+      {/* 
+
+      */}
+      <Navbar />
+      <Hero />
+
+  
     </div>
   );
-}
+};
 
 export default HomePage;

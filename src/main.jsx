@@ -1,17 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css";
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+// src/main.jsx
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const queryClient = new QueryClient();
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom' // <-- 1. Đã import chưa?
+import App from './App.jsx'
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <BrowserRouter> {/* <-- 2. Đã bọc <App /> chưa? */}
       <App />
-    </QueryClientProvider>
+    </BrowserRouter>
   </React.StrictMode>,
-);
+)

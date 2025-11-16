@@ -1,137 +1,90 @@
-/* ---- File: RegisterPage.css ---- */
+/* src/pages/RegisterPage/RegisterPage.css */
 
-* {
-  box-sizing: border-box;
-
-}
-
-/* Container chính bao bọc toàn bộ trang */
-.register-wrapper {
+/* --- Cấu trúc tổng thể --- */
+.login-page-container {
   display: flex;
-  min-height: 100vh; /* Đảm bảo chiều cao tối thiểu */
-  background-color: #f4f7f6; /* Nền xám nhạt hơn một chút */
-  overflow: hidden; /* Tránh scroll ngang không mong muốn */
-}
-
-/* Bên trái: chứa ảnh */
-.register-left {
-  flex: 1; /* Chiếm 1 nửa */
-  display: flex; /* Canh giữa ảnh (nếu ảnh nhỏ hơn) */
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* Đảm bảo ảnh không tràn ra ngoài */
-  /* Loại bỏ bo góc khi màn hình nhỏ */
-}
-
-.register-left img {
   width: 100%;
-  height: 100%;
-  object-fit: cover; /* Đảm bảo ảnh che phủ toàn bộ khu vực */
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
 }
 
-/* Bên phải: chứa form đăng ký */
-.register-right {
-  flex: 1; /* Chiếm 1 nửa */
+/* --- CỘT PHẢI (PROMO) --- */
+.login-promo-section {
+  flex: 1;
+  background-color: #2b3a6e;
+  color: white;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 2rem; /* Thêm padding để form không dính sát viền */
+  align-items: flex-start;
+  padding: 4rem;
+  box-sizing: border-box;
+}
+.login-promo-section h2 { ... }
+.login-promo-section p { ... }
+.dashboard-preview-img { ... }
+
+/* --- CỘT TRÁI (FORM) --- */
+.login-form-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
 }
 
-/* Form đăng ký */
-.register-form {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1); /* Shadow nhẹ nhàng hơn */
-  width: 100%; /* Chiếm toàn bộ chiều rộng bên phải */
-  max-width: 400px; /* Giới hạn chiều rộng tối đa */
+.login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* --- Logo & Tiêu đề --- */
+.login-logo { ... }
+.login-title { ... }
+.login-subtitle { ... }
+
+/* --- Form elements --- */
+.form-group { ... }
+.form-group label { ... }
+.form-group input { ... }
+
+/* --- Xử lý lỗi input --- */
+.form-group input.input-error { ... }
+.error-text { ... }
+.api-error { ... }
+
+/* --- Icon ẩn/hiện password --- */
+.password-wrapper { ... }
+.password-toggle-icon { ... }
+
+/* --- Tùy chọn: Remember & Forgot --- */
+.form-options { ... }
+/* (Bạn có thể giữ lại .form-options hoặc không, vì ta không dùng nữa) */
+
+/* <-- THÊM MỚI: Style cho dòng "Terms of Service" (thay cho Remember me) */
+.form-options-register {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #777;
   text-align: center;
 }
 
-.register-form h2 {
-  margin-bottom: 2rem;
-  color: #333;
-  font-weight: 600;
-}
+/* --- Nút Log In (giữ nguyên class, chỉ đổi text trong JSX) --- */
+.btn-login { ... }
+.btn-login:hover { ... }
 
-.register-form label {
-  display: block;
-  margin-top: 1rem;
-  margin-bottom: 0.3rem; /* Khoảng cách giữa label và input */
-  font-weight: 600;
-  text-align: left;
-  color: #555;
-  font-size: 0.9rem;
-}
+/* --- Social Login --- */
+.divider { ... }
+.social-login-buttons { ... }
+.btn-social { ... }
+.btn-social:hover { ... }
 
-.register-form input {
-  width: 100%;
-  padding: 0.8rem 1rem; /* Padding dễ chịu hơn */
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Thêm hiệu ứng shadow */
-}
+/* --- Link Đăng ký --- */
+.register-link { ... }
+.register-link a { ... }
+.register-link a:hover { ... }
 
-.register-form input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Thêm hiệu ứng focus */
-}
-
-/* --- Style cho thông báo lỗi --- */
-.error-message {
-  color: #dc3545; /* Màu đỏ báo lỗi */
-  font-size: 0.85rem;
-  text-align: left;
-  margin-top: 0.25rem;
-}
-
-/* Nút đăng ký */
-.register-form button {
-  margin-top: 2rem; /* Tăng khoảng cách trên */
-  width: 100%;
-  padding: 0.9rem; /* Nút to hơn */
-  background-color: #007bff;
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem; /* Chữ to hơn */
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease; /* Thêm hiệu ứng transform */
-}
-
-.register-form button:hover {
-  background-color: #0056b3;
-}
-
-.register-form button:active {
-  transform: scale(0.98); /* Hiệu ứng nhấn nút */
-}
-
-/* --- Responsive cho màn hình nhỏ (ví dụ: điện thoại) --- */
-@media (max-width: 768px) {
-  .register-wrapper {
-    flex-direction: column; /* Chuyển thành layout cột */
-  }
-
-  .register-left {
-    /* Ẩn ảnh trên màn hình quá nhỏ để tiết kiệm không gian */
-    display: none; 
-    /* Hoặc bạn có thể đặt chiều cao cố định: height: 250px; */
-  }
-
-  .register-right {
-    /* Đảm bảo form căn giữa khi chỉ có một cột */
-    padding: 1.5rem; /* Giảm padding */
-    width: 100%;
-  }
-
-  .register-form {
-    padding: 2rem; /* Giảm padding form */
-    max-width: none; /* Bỏ giới hạn chiều rộng */
-    box-shadow: none; /* Bỏ shadow nếu muốn */
-  }
-}
+/* --- Responsive cho mobile --- */
+@media (max-width: 768px) { ... }
