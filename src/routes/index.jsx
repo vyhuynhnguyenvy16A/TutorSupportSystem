@@ -6,7 +6,8 @@ import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx';
 // Đảm bảo các đường dẫn import này là CHÍNH XÁC
 import HomePage from '../pages/user_homepage/HomePage.jsx';
 import LoginPage from '../pages/Login/LoginPage.jsx';
-
+import ForgotPasswordPage from '../pages/ForgotPassword.jsx';
+import SchedulePage from '../pages/SchedulePage.jsx';
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
 
 const AppRoutes = () => {
@@ -22,8 +23,17 @@ const AppRoutes = () => {
       */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      {/* (Lưu ý: chúng ta dùng /app/schedule để khớp với NavLink) */}
+      <Route path="/app/schedule" element={<SchedulePage />} />
+
+      {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
+      <Route path="/app/overview" element={<div>Trang Tổng Quan</div>} />
+      <Route path="/app/register-schedule" element={<div>Trang Đăng Kí Lịch</div>} />
+      <Route path="/app/settings" element={<div>Trang Cài Đặt</div>} />
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
+      
     </Routes>
   );
 };

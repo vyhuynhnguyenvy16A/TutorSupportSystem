@@ -63,14 +63,22 @@ const LoginPage = () => {
     // (Đây là nơi bạn sẽ gọi API thật)
     
     // Giả sử: server trả về lỗi "Sai mật khẩu"
-    if (password === '123456') {
-      setErrors({ api: 'Invalid email or password. Please try again.' });
-      return;
+    const FAKE_ADMIN_EMAIL = 'admin@gmail.com';
+    const FAKE_ADMIN_PASSWORD = 'password123';
+
+    // 3. Kiểm tra dữ liệu nhập
+    if (email === FAKE_ADMIN_EMAIL && password === FAKE_ADMIN_PASSWORD) {
+      // 4. ĐĂNG NHẬP THÀNH CÔNG
+      alert('Đăng nhập thành công! Đang chuyển đến trang Lịch...');
+      
+      // <-- SỬA ĐỔI QUAN TRỌNG: Chuyển hướng đến trang /app/schedule
+      navigate('/app/schedule'); 
+      
+    } else {
+      // 5. ĐĂNG NHẬP THẤT BẠI
+      // Hiển thị lỗi chung (như từ server trả về)
+      setErrors({ api: 'Email hoặc mật khẩu không đúng.' });
     }
-    
-    // Giả sử: Login thành công
-    alert('Login successful! Redirecting to homepage...');
-    // navigate('/'); // Chuyển về trang chủ
   };
 
   return (
