@@ -1,0 +1,45 @@
+/* src/pages/TutorSlotsPage/TutorSlotsPage.css */
+
+/* File này chứa các style MỚI cho trang Quản lý Slots,
+  các style chung (bảng, filter input) đã có trong SchedulePage.css
+*/
+
+/* 1. Nút "Thêm Slot mới" (dựa trên .btn-export) */
+.btn-add-slot {
+  margin-left: auto;
+  background-color: #4f46e5; /* Màu tím chính */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-add-slot:hover {
+  background-color: #4338ca;
+}
+
+/* 2. Cột Hành động (Sửa, Xóa) */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action-edit,
+.btn-action-delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+}
+
+.btn-action-edit {
+  color: #3b82f6; /* Màu xanh dương */
+}
+.btn-action-delete {
+  color: #ef4444; /* Màu đỏ */
+}

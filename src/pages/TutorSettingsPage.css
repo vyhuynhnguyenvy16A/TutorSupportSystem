@@ -1,0 +1,99 @@
+/* src/pages/TutorSettingsPage/TutorSettingsPage.css */
+
+/* File này giống hệt SettingsPage.css 
+   vì layout nội dung trang là tương tự 
+*/
+
+/* 1. Thanh Tabs (Không dùng trong JSX nhưng giữ lại cho giống file gốc) */
+.settings-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+.tab-link {
+  padding: 0.75rem 0;
+  margin-right: 2rem;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+}
+.tab-link.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+/* 2. Lưới nội dung chính */
+.settings-content-grid {
+  display: grid;
+  /* (Comment trong file gốc nói chia 2 cột nhưng code là 1) */
+  grid-template-columns: 1fr; 
+  gap: 2rem;
+}
+
+/* 2.1 CỘT BÊN TRÁI */
+.profile-details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.profile-section {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.avatar-section span {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+.avatar-section img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Kiểu hiển thị text (thay cho input) */
+.form-field-row,
+.form-field-row-full {
+  margin-bottom: 1rem;
+}
+.form-field-row label,
+.form-field-row-full label {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+.field-value {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb; /* Màu nền xám nhạt */
+  font-size: 0.9rem;
+  color: #111827;
+  box-sizing: border-box;
+  min-height: 42px; /* Đảm bảo chiều cao tối thiểu */
+}
+
+/* 2.2 CỘT BÊN PHẢI */
