@@ -18,7 +18,7 @@
   justify-content: center;
   align-items: flex-start;
   padding: 4rem;
-  box-sizing: border-box; /* Quan trọng */
+  box-sizing: border-box; 
 }
 
 .login-promo-section h2 {
@@ -30,7 +30,7 @@
 
 .login-promo-section p {
   font-size: 1.1rem;
-  color: #c0c8e0; /* Màu text nhạt hơn */
+  color: #c0c8e0;
   max-width: 450px;
   line-height: 1.5;
   margin-bottom: 2rem;
@@ -51,7 +51,7 @@
   align-items: center;
   padding: 2rem;
   background-color: #ffffff;
-  box-sizing: border-box; /* Quan trọng */
+  box-sizing: border-box; 
 }
 
 .login-form-wrapper {
@@ -70,7 +70,7 @@
 .login-logo .logo-icon {
   font-size: 2rem;
   margin-right: 0.5rem;
-  color: #4f46e5; /* Màu logo */
+  color: #4f46e5;
 }
 
 .login-title {
@@ -103,7 +103,7 @@
   padding: 0.85rem 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-sizing: border-box; /* Quan trọng */
+  box-sizing: border-box;
   font-size: 1rem;
 }
 
