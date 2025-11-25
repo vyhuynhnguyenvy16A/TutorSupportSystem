@@ -2,13 +2,12 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './LoginPage.css'; // Import file CSS
+import './LoginPage.css';
 
 // Import icons
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
-
 
 import dashboardPreview from '../../assets/hcmut.png';
 
@@ -21,62 +20,78 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate(); // Dùng để chuyển trang sau khi login
+  const navigate = useNavigate();
 
   // --- LOGIC VALIDATION ---
   const validateForm = () => {
     const newErrors = {};
 
-    // Kiểm tra Email
     if (!email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email address is invalid';
     }
-
-    // Kiểm tra Password
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
-    
-    // Trả về true nếu không có lỗi, false nếu có lỗi
     return Object.keys(newErrors).length === 0;
+  };
+
+  // --- HÀM ĐIỀU HƯỚNG THEO ROLE (CORE LOGIC) ---
+  const handleRoleRedirect = (role) => {
+    // Chuẩn hóa role về chữ thường để so sánh
+    const roleLower = role ? role.toLowerCase() : '';
+
+    if (roleLower === 'tutor') {
+      alert('Đăng nhập Tutor thành công! Chuyển hướng Tutor Dashboard...');
+      // Điều hướng đến trang Overview của Tutor
+      navigate('/app/tutor/overview');
+    } else if (roleLower === 'student') {
+      alert('Đăng nhập Student thành công! Chuyển hướng Student Dashboard...');
+      // Điều hướng đến trang Overview của Student
+      navigate('/app/overview');
+    } else {
+      // Mặc định nếu không rõ role hoặc role khác
+      alert('Đăng nhập thành công! Chuyển hướng mặc định...');
+      navigate('/app/overview');
+    }
   };
 
   // --- LOGIC SUBMIT FORM ---
   const handleSubmit = (e) => {
-    e.preventDefault(); // Ngăn form reload trang
+    e.preventDefault();
 
-    // 1. Kiểm tra lỗi client-side
     if (!validateForm()) {
-      return; // Dừng lại nếu validation thất bại
+      return;
     }
 
-    // 2. Nếu validation OK, mô phỏng gọi API
-    console.log('Submitting:', { email, password });
+    console.log('Logging in:', { email, password });
 
-    // --- MÔ PHỎNG XỬ LÝ LỖI TỪ SERVER ---
-    // (Đây là nơi bạn sẽ gọi API thật)
-    
-    // Giả sử: server trả về lỗi "Sai mật khẩu"
-    const FAKE_ADMIN_EMAIL = 'admin@gmail.com';
-    const FAKE_ADMIN_PASSWORD = 'password123';
+    // 1. KIỂM TRA TÀI KHOẢN MẶC ĐỊNH (Hardcoded cho Dev/Test)
+    const FAKE_TUTOR = { email: 'tutor@example.com', password: 'tutor123' };
+    const FAKE_STUDENT = { email: 'student@example.com', password: 'student123' };
 
-    // 3. Kiểm tra dữ liệu nhập
-    if (email === FAKE_ADMIN_EMAIL && password === FAKE_ADMIN_PASSWORD) {
-      // 4. ĐĂNG NHẬP THÀNH CÔNG
-      alert('Đăng nhập thành công! Đang chuyển đến trang Lịch...');
-      
-      // <-- SỬA ĐỔI QUAN TRỌNG: Chuyển hướng đến trang /app/schedule
-      navigate('/app/schedule'); 
-      
+    if (email === FAKE_TUTOR.email && password === FAKE_TUTOR.password) {
+      handleRoleRedirect('Tutor');
+      return;
+    }
+
+    if (email === FAKE_STUDENT.email && password === FAKE_STUDENT.password) {
+      handleRoleRedirect('Student');
+      return;
+    }
+
+    // 2. KIỂM TRA TÀI KHOẢN TRONG LOCALSTORAGE (User đăng ký thật)
+    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const foundUser = storedUsers.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (foundUser) {
+      // Tìm thấy user -> Điều hướng theo role đã lưu
+      handleRoleRedirect(foundUser.role);
     } else {
-      // 5. ĐĂNG NHẬP THẤT BẠI
-      // Hiển thị lỗi chung (như từ server trả về)
+      // 3. ĐĂNG NHẬP THẤT BẠI
       setErrors({ api: 'Email hoặc mật khẩu không đúng.' });
     }
   };
@@ -86,14 +101,10 @@ const LoginPage = () => {
       {/* --------------- CỘT BÊN TRÁI (FORM) --------------- */}
       <div className="login-form-section">
         <div className="login-form-wrapper">
-          {/* Logo */}
           <div className="login-logo">
-            {/* Bạn có thể dùng thẻ img nếu có file logo */}
-          
-            
+             {/* Logo here if needed */}
           </div>
 
-          {/* Tiêu đề */}
           <h2 className="login-title">Welcome Back</h2>
           <p className="login-subtitle">
             Enter your email and password to access your account.
@@ -110,7 +121,7 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={errors.email ? 'input-error' : ''}
-                placeholder="sellostore@company.com"
+                placeholder="name@example.com"
               />
               {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
@@ -125,7 +136,7 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={errors.password ? 'input-error' : ''}
-                  placeholder="5ellostore."
+                  placeholder="Enter password"
                 />
                 <span
                   className="password-toggle-icon"
@@ -137,7 +148,7 @@ const LoginPage = () => {
               {errors.password && <p className="error-text">{errors.password}</p>}
             </div>
 
-            {/* --- Lỗi API (lỗi server) --- */}
+            {/* --- Lỗi API --- */}
             {errors.api && <p className="error-text api-error">{errors.api}</p>}
 
             {/* --- Tùy chọn: Remember & Forgot --- */}
@@ -175,7 +186,6 @@ const LoginPage = () => {
 
       {/* --------------- CỘT BÊN PHẢI (PROMO) --------------- */}
       <div className="login-promo-section">
-        
         <img
           src={dashboardPreview}
           alt="Dashboard Preview"
