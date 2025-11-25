@@ -5,7 +5,7 @@
   display: flex;
   width: 100%;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* --- CỘT PHẢI (PROMO) --- */
@@ -16,13 +16,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding: 4rem;
   box-sizing: border-box;
 }
-.login-promo-section h2 { ... }
-.login-promo-section p { ... }
-.dashboard-preview-img { ... }
+
+.dashboard-preview-img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
 
 /* --- CỘT TRÁI (FORM) --- */
 .login-form-section {
@@ -37,54 +40,219 @@
 
 .login-form-wrapper {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }
 
 /* --- Logo & Tiêu đề --- */
-.login-logo { ... }
-.login-title { ... }
-.login-subtitle { ... }
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* --- ROLE SELECTION STYLES --- */
+.role-selection-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.role-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  background-color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.role-btn:hover {
+  border-color: #9ca3af;
+  background-color: #f9fafb;
+}
+
+/* Trạng thái Active cho Role */
+.role-btn.active {
+  border-color: #4f46e5; /* Màu chủ đạo */
+  background-color: #eef2ff; /* Màu nền nhạt chủ đạo */
+  color: #4f46e5;
+}
+
+.role-icon {
+  font-size: 1.2rem;
+}
 
 /* --- Form elements --- */
-.form-group { ... }
-.form-group label { ... }
-.form-group input { ... }
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
 
 /* --- Xử lý lỗi input --- */
-.form-group input.input-error { ... }
-.error-text { ... }
-.api-error { ... }
+.form-group input.input-error {
+  border-color: #ef4444;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
 
 /* --- Icon ẩn/hiện password --- */
-.password-wrapper { ... }
-.password-toggle-icon { ... }
+.password-wrapper {
+  position: relative;
+}
 
-/* --- Tùy chọn: Remember & Forgot --- */
-.form-options { ... }
-/* (Bạn có thể giữ lại .form-options hoặc không, vì ta không dùng nữa) */
+.password-toggle-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
 
-/* <-- THÊM MỚI: Style cho dòng "Terms of Service" (thay cho Remember me) */
+/* --- Terms text --- */
 .form-options-register {
   margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 0.85rem;
+  color: #6b7280;
   text-align: center;
 }
 
-/* --- Nút Log In (giữ nguyên class, chỉ đổi text trong JSX) --- */
-.btn-login { ... }
-.btn-login:hover { ... }
+/* --- Nút Sign Up --- */
+.btn-login {
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+  background-color: #4338ca;
+}
 
 /* --- Social Login --- */
-.divider { ... }
-.social-login-buttons { ... }
-.btn-social { ... }
-.btn-social:hover { ... }
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
 
-/* --- Link Đăng ký --- */
-.register-link { ... }
-.register-link a { ... }
-.register-link a:hover { ... }
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
 
-/* --- Responsive cho mobile --- */
-@media (max-width: 768px) { ... }
+.divider::before { margin-right: 0.75rem; }
+.divider::after { margin-left: 0.75rem; }
+
+.social-login-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-social {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-social:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* --- Link Đăng nhập --- */
+.register-link {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.register-link a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .login-page-container {
+    flex-direction: column;
+  }
+  .login-promo-section {
+    display: none;
+  }
+  .login-form-section {
+    padding: 1.5rem;
+  }
+}
