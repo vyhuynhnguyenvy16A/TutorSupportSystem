@@ -8,6 +8,7 @@ import HomePage from '../pages/user_homepage/HomePage.jsx';
 import LoginPage from '../pages/Login/LoginPage.jsx';
 import ForgotPasswordPage from '../pages/ForgotPassword.jsx';
 import SchedulePage from '../pages/SchedulePage.jsx';
+import Dashboard from "../pages/admin/Dashboard.jsx";
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
 import SettingsPage from '../pages/SettingsPage.jsx';
 import OverviewPage from '../pages/OverviewPage.jsx';
@@ -39,8 +40,10 @@ const AppRoutes = () => {
       <Route path="/app/settings" element={<SettingsPage />} />
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
+      
+      <Route path="/admin" element={<Dashboard />} />
 
-      {/* 4 ROUTES CHO TUTOR (GIẢNG VIÊN) VÀO ĐÂY --> */}
+      {/* <-- 2. THÊM 4 ROUTES MỚI CHO TUTOR (GIẢNG VIÊN) VÀO ĐÂY --> */}
       <Route path="/app/tutor/overview" element={<TutorOverviewPage />} />
       <Route path="/app/tutor/schedule" element={<TutorSchedulePage />} />
       <Route path="/app/tutor/slots" element={<TutorSlotsPage />} />
