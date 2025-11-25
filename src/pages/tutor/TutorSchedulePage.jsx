@@ -1,3 +1,4 @@
+// TutorSchedulePage.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import './TutorSchedulePage.css'; 
@@ -7,40 +8,63 @@ import {
 } from 'react-icons/fi';
 import dashboardPreview from '../../assets/hcmut.png';
 
-// Mock Data: Lịch sắp tới
+// Mock Data: Cập nhật field 'quantity' thay vì 'student'
 const upcomingSchedule = [
-  { id: 1, subject: 'Công nghệ phần mềm', student: 'Nguyễn Văn A', time: '2025-11-25', fullTime: '25/11/2025 09:00', status: 'Đã xác nhận', result: 'Sắp tới' },
-  { id: 2, subject: 'Trí tuệ nhân tạo', student: 'Trần Thị B', time: '2025-11-26', fullTime: '26/11/2025 10:30', status: 'Chờ sinh viên', result: 'Chờ duyệt' },
+  { id: 1, subject: 'Công nghệ phần mềm', quantity: 45, time: '2025-11-25', fullTime: '25/11/2025 09:00', status: 'Đã xác nhận', result: 'Sắp tới' },
+  { id: 2, subject: 'Trí tuệ nhân tạo', quantity: 32, time: '2025-11-26', fullTime: '26/11/2025 10:30', status: 'Chờ sinh viên', result: 'Chờ duyệt' },
 ];
 
-// Mock Data: Lịch đã qua
 const pastSchedule = [
-  { id: 3, subject: 'Mạng máy tính', student: 'Lê Văn C', time: '2025-10-22', fullTime: '22/10/2025 14:00', status: 'Đã hủy', result: 'Đã hủy' },
-  { id: 4, subject: 'An toàn thông tin', student: 'Phạm Thị D', time: '2025-10-20', fullTime: '20/10/2025 11:00', status: 'Thành công', result: 'Đã dạy' },
+  { id: 3, subject: 'Mạng máy tính', quantity: 50, time: '2025-10-22', fullTime: '22/10/2025 14:00', status: 'Đã hủy', result: 'Đã hủy' },
+  { id: 4, subject: 'An toàn thông tin', quantity: 28, time: '2025-10-20', fullTime: '20/10/2025 11:00', status: 'Thành công', result: 'Đã dạy' },
 ];
 
 const TutorSchedulePage = () => {
-  const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' | 'past'
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
 
-  // Xác định nguồn dữ liệu dựa trên tab
+  // Data Source
   const currentData = activeTab === 'upcoming' ? upcomingSchedule : pastSchedule;
 
-  // Logic Filter theo ngày
+  // Filter Logic
   const filteredData = currentData.filter(item => {
-    if (!startDate && !endDate) return true;
-    const itemDate = item.time; // YYYY-MM-DD for comparison
-    if (startDate && itemDate < startDate) return false;
-    if (endDate && itemDate > endDate) return false;
+    // Date Filter
+    if (startDate && item.time < startDate) return false;
+    if (endDate && item.time > endDate) return false;
+    
+    // Search Filter
+    if (searchTerm && !item.subject.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    
     return true;
   });
 
-  // Logic Export CSV
+  // Search Logic (Consistent UI)
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    // Simple suggestion based on current tab data
+    if (value.length > 0) {
+      const matches = currentData
+        .filter(c => c.subject.toLowerCase().includes(value.toLowerCase()))
+        .map(c => c.subject);
+      setSuggestions([...new Set(matches)]); // Unique
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSelectSuggestion = (val) => {
+    setSearchTerm(val);
+    setSuggestions([]);
+  };
+
   const handleExport = () => {
-    const headers = ["ID,Môn Học,Sinh Viên,Thời Gian,Trạng Thái,Kết Quả"];
+    const headers = ["ID,Môn Học,Số Lượng HV,Thời Gian,Trạng Thái,Kết Quả"];
     const rows = filteredData.map(item => 
-      `${item.id},${item.subject},${item.student},${item.fullTime},${item.status},${item.result}`
+      `${item.id},${item.subject},${item.quantity},${item.fullTime},${item.status},${item.result}`
     );
     const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -70,13 +94,33 @@ const TutorSchedulePage = () => {
       <div className="dashboard-main-content">
         <header className="dashboard-header">
           <h1 className="header-title">Lịch dạy của tôi</h1>
-          <div className="header-search"><FiSearch /><input type="text" placeholder="Tìm kiếm lịch dạy..." /></div>
+          
+          {/* SEARCH BAR CONSISTENT UI */}
+          <div className="header-search-wrapper" style={{marginLeft: '2rem', position: 'relative', width: '300px'}}>
+            <div className="header-search">
+              <FiSearch />
+              <input 
+                type="text" 
+                placeholder="Tìm môn học..." 
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+            {suggestions.length > 0 && (
+              <ul className="search-suggestions">
+                {suggestions.map((s, idx) => (
+                  <li key={idx} onClick={() => handleSelectSuggestion(s)}>{s}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <div className="header-actions">
             <button className="btn-icon btn-plus"><FiPlus /></button>
             <button className="btn-icon"><FiBell /></button>
             <div className="user-profile">
               <img src="https://via.placeholder.com/40" alt="Avatar" />
-              <div className="user-info"><span>Jane Doe (GV)</span><small>Lecturer</small></div>
+              <div className="user-info"><span>Jane Doe</span><small>Giảng viên</small></div>
             </div>
           </div>
         </header>
@@ -124,7 +168,8 @@ const TutorSchedulePage = () => {
               <thead>
                 <tr>
                   <th>MÔN HỌC</th>
-                  <th>SINH VIÊN</th>
+                  {/* Changed Column Header */}
+                  <th>SỐ LƯỢNG</th> 
                   <th>THỜI GIAN</th>
                   <th>TRẠNG THÁI</th>
                   <th>KẾT QUẢ</th>
@@ -133,8 +178,9 @@ const TutorSchedulePage = () => {
               <tbody>
                 {filteredData.length > 0 ? filteredData.map((reg) => (
                   <tr key={reg.id}>
-                    <td>{reg.subject}</td>
-                    <td>{reg.student}</td>
+                    <td><strong>{reg.subject}</strong></td>
+                    {/* Changed Data Cell */}
+                    <td>{reg.quantity} học viên</td>
                     <td>{reg.fullTime}</td>
                     <td>
                       <span className={`status ${
