@@ -1,4 +1,4 @@
-# Dự án Web Bán Hàng (PERN Stack)
+# Dự án Web 
 
 Đây là dự án nội bộ nhằm xây dựng một website đặt lịch họp tư vấn giữa sinh viên và giảng viên/cố vấn (tutor). Project được xây dựng trên nền tảng PERN Stack (PostgreSQL, Express, React, Node.js) và được tổ chức theo mô hình MVC.
 
