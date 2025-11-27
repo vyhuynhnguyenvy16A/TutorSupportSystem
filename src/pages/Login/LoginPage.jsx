@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './LoginPage.css'; // Import file CSS
+import './LoginPage.css';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,7 +10,6 @@ import { useAuth } from '../../context/AuthContext';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
-
 
 import dashboardPreview from '../../assets/hcmut.png';
 import { use } from 'react';
@@ -36,14 +35,9 @@ const LoginPage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Kiểm tra Email
     if (!email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email address is invalid';
     }
-
-    // Kiểm tra Password
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 8) {
@@ -51,16 +45,33 @@ const LoginPage = () => {
     }
 
     setErrors(newErrors);
-    
-    // Trả về true nếu không có lỗi, false nếu có lỗi
     return Object.keys(newErrors).length === 0;
+  };
+
+  // --- HÀM ĐIỀU HƯỚNG THEO ROLE (CORE LOGIC) ---
+  const handleRoleRedirect = (role) => {
+    // Chuẩn hóa role về chữ thường để so sánh
+    const roleLower = role ? role.toLowerCase() : '';
+
+    if (roleLower === 'tutor') {
+      alert('Đăng nhập Tutor thành công! Chuyển hướng Tutor Dashboard...');
+      // Điều hướng đến trang Overview của Tutor
+      navigate('/app/tutor/overview');
+    } else if (roleLower === 'student') {
+      alert('Đăng nhập Student thành công! Chuyển hướng Student Dashboard...');
+      // Điều hướng đến trang Overview của Student
+      navigate('/app/overview');
+    } else {
+      // Mặc định nếu không rõ role hoặc role khác
+      alert('Đăng nhập thành công! Chuyển hướng mặc định...');
+      navigate('/app/overview');
+    }
   };
 
   // --- LOGIC SUBMIT FORM ---
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    // 1. Kiểm tra lỗi client-side
     if (!validateForm()) {
       return;
     }
@@ -74,8 +85,7 @@ const LoginPage = () => {
       setErrors({api: "Đăng nhập thất bại"})
     }
 
-    // 2. Nếu validation OK, mô phỏng gọi API
-    console.log('Submitting:', { email, password });
+    console.log('Logging in:', { email, password });
 
     const role = userData.role;
 
@@ -94,14 +104,10 @@ const LoginPage = () => {
       {/* --------------- CỘT BÊN TRÁI (FORM) --------------- */}
       <div className="login-form-section">
         <div className="login-form-wrapper">
-          {/* Logo */}
           <div className="login-logo">
-            {/* Bạn có thể dùng thẻ img nếu có file logo */}
-          
-            
+             {/* Logo here if needed */}
           </div>
 
-          {/* Tiêu đề */}
           <h2 className="login-title">Welcome Back</h2>
           <p className="login-subtitle">
             Enter your email and password to access your account.
@@ -147,7 +153,7 @@ const LoginPage = () => {
               {errors.password && <p className="error-text">{errors.password}</p>}
             </div>
 
-            {/* --- Lỗi API (lỗi server) --- */}
+            {/* --- Lỗi API --- */}
             {errors.api && <p className="error-text api-error">{errors.api}</p>}
 
             {/* --- Tùy chọn: Remember & Forgot --- */}
@@ -185,7 +191,6 @@ const LoginPage = () => {
 
       {/* --------------- CỘT BÊN PHẢI (PROMO) --------------- */}
       <div className="login-promo-section">
-        
         <img
           src={dashboardPreview}
           alt="Dashboard Preview"

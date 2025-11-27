@@ -1,27 +1,29 @@
 // src/pages/RegisterPage/RegisterPage.jsx
 
 import React, { useState } from 'react';
-// <-- THÊM MỚI: Import Link
 import { Link, useNavigate } from 'react-router-dom';
-import './RegisterPage.css'; // <-- THÊM MỚI: Dùng file CSS riêng
+import './RegisterPage.css'; 
 
 // Import icons
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiUser, FiBookOpen } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
 
-// Import ảnh dashboard (giữ nguyên)
+// Import ảnh dashboard
 import dashboardPreview from '../../assets/hcmut.png';
 
 const RegisterPage = () => {
-  // <-- SỬA ĐỔI: Thêm state cho 'name' và 'confirmPassword'
+  // State form fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // <-- THÊM MỚI
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // State Role ('Student' | 'Tutor' | '')
+  const [role, setRole] = useState('');
 
-  // State cho logic (giữ nguyên)
+  // State logic
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // <-- THÊM MỚI
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
@@ -30,21 +32,26 @@ const RegisterPage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Kiểm tra Email (giữ nguyên)
+    // 1. Validate Role
+    if (!role) {
+      newErrors.role = 'Please select a role (Student or Tutor)';
+    }
+
+    // 2. Validate Email
     if (!email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Email address is invalid';
     }
 
-    // Kiểm tra Password (giữ nguyên)
+    // 3. Validate Password
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
     
-    // <-- THÊM MỚI: Kiểm tra Confirm Password
+    // 4. Validate Confirm Password
     if (!confirmPassword) {
       newErrors.confirmPassword = 'Password confirmation is required';
     } else if (password !== confirmPassword) {
@@ -62,12 +69,34 @@ const RegisterPage = () => {
       return;
     }
 
-    // Nếu validation OK, mô phỏng gọi API
-    console.log('Registering:', { email, password });
+    // 1. Tạo đối tượng User mới
+    const newUser = {
+      email: email,
+      password: password,
+      role: role
+    };
+
+    // 2. Lưu vào localStorage (Giả lập Database)
+    // Lấy danh sách users cũ nếu có
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
     
-    // Giả sử: Đăng ký thành công
-    alert('Registration successful! Redirecting to login...');
-    navigate('/login'); // <-- SỬA ĐỔI: Chuyển về trang login
+    // Kiểm tra xem email đã tồn tại chưa (Optional)
+    const userExists = existingUsers.some(u => u.email === email);
+    if (userExists) {
+      setErrors({ email: 'This email is already registered.' });
+      return;
+    }
+
+    // Thêm user mới vào danh sách
+    existingUsers.push(newUser);
+    localStorage.setItem('users', JSON.stringify(existingUsers));
+
+    // 3. Thông báo thành công
+    console.log('Registered successfully:', newUser);
+    alert('Đăng ký thành công! Vui lòng đăng nhập.');
+
+    // 4. CHUYỂN HƯỚNG VỀ TRANG LOGIN
+    navigate('/login');
   };
 
   return (
@@ -75,19 +104,43 @@ const RegisterPage = () => {
       {/* --------------- CỘT BÊN TRÁI (FORM) --------------- */}
       <div className="login-form-section">
         <div className="login-form-wrapper">
-          {/* Logo (giữ nguyên) */}
           <div className="login-logo">
-            
+            {/* Placeholder Logo */}
           </div>
 
-          {/* <-- SỬA ĐỔI: Tiêu đề */}
           <h2 className="login-title">Create Account</h2>
           <p className="login-subtitle">
-            Get started by creating your new account.
+            Join us to learn or teach efficiently.
           </p>
 
           <form onSubmit={handleSubmit} noValidate>
-            {/* --- Email (giữ nguyên) --- */}
+            
+            {/* <-- ROLE SELECTION --> */}
+            <div className="form-group">
+              <label>I want to be a...</label>
+              <div className="role-selection-group">
+                <button
+                  type="button" 
+                  className={`role-btn ${role === 'Student' ? 'active' : ''}`}
+                  onClick={() => setRole('Student')}
+                >
+                  <FiUser className="role-icon"/>
+                  <span>Student</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`role-btn ${role === 'Tutor' ? 'active' : ''}`}
+                  onClick={() => setRole('Tutor')}
+                >
+                  <FiBookOpen className="role-icon"/>
+                  <span>Tutor</span>
+                </button>
+              </div>
+              {errors.role && <p className="error-text">{errors.role}</p>}
+            </div>
+
+            {/* --- Email --- */}
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -96,12 +149,12 @@ const RegisterPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={errors.email ? 'input-error' : ''}
-                placeholder="sellostore@company.com"
+                placeholder="name@example.com"
               />
               {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
 
-            {/* --- Password (giữ nguyên, chỉ đổi ID) --- */}
+            {/* --- Password --- */}
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <div className="password-wrapper">
@@ -111,7 +164,7 @@ const RegisterPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={errors.password ? 'input-error' : ''}
-                  placeholder="At least 6 characters"
+                  placeholder="Min 6 characters"
                 />
                 <span
                   className="password-toggle-icon"
@@ -123,7 +176,7 @@ const RegisterPage = () => {
               {errors.password && <p className="error-text">{errors.password}</p>}
             </div>
 
-            {/* <-- THÊM MỚI: Confirm Password --- */}
+            {/* --- Confirm Password --- */}
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <div className="password-wrapper">
@@ -133,7 +186,7 @@ const RegisterPage = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className={errors.confirmPassword ? 'input-error' : ''}
-                  placeholder="Repeat your password"
+                  placeholder="Repeat password"
                 />
                 <span
                   className="password-toggle-icon"
@@ -145,18 +198,15 @@ const RegisterPage = () => {
               {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
             </div>
 
-            {/* <-- SỬA ĐỔI: Bỏ "Remember Me" và "Forgot Password" */}
             <div className="form-options-register">
               <span>By signing up, you agree to our Terms of Service.</span>
             </div>
 
-            {/* <-- SỬA ĐỔI: Nút Log In thành Sign Up --- */}
             <button type="submit" className="btn-login">
               Sign Up
             </button>
           </form>
 
-          {/* --- Social Login (giữ nguyên) --- */}
           <div className="divider">Or Sign Up With</div>
           <div className="social-login-buttons">
             <button className="btn-social google">
@@ -167,7 +217,6 @@ const RegisterPage = () => {
             </button>
           </div>
 
-          {/* <-- SỬA ĐỔI: Link Đăng ký thành Link Đăng nhập --- */}
           <p className="register-link">
             Already Have An Account? <Link to="/login">Log In Now.</Link>
           </p>
@@ -175,9 +224,9 @@ const RegisterPage = () => {
       </div>
 
       {/* --------------- CỘT BÊN PHẢI (PROMO) --------------- */}
-      {/* (Giữ nguyên không thay đổi) */}
       <div className="login-promo-section">
-        
+        <h2 style={{fontSize: '2rem', marginBottom: '1rem'}}>Join Our Community</h2>
+        <p style={{marginBottom: '2rem', opacity: 0.9}}>Experience the best learning management system.</p>
         <img
           src={dashboardPreview}
           alt="Dashboard Preview"
