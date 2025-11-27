@@ -1,182 +1,173 @@
-/* src/pages/OverviewPage/OverviewPage.css */
+/* src/pages/student/OverviewPage.css */
 
-/* Thanh thông báo màu hồng */
-.notification-bar {
-  background-color: #fce7f3; /* Màu hồng nhạt */
-  color: #831843; /* Màu hồng đậm */
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
+.overview-intro {
+  margin-bottom: 2rem;
+}
+.overview-intro h2 { margin: 0 0 0.5rem 0; color: #111827; }
+.overview-intro p { margin: 0; color: #6b7280; }
+
+/* Grid Layout cho các đợt */
+.batch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card Style */
+.batch-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.batch-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Colors */
+.batch-card.open { border-left: 5px solid #059669; }
+.batch-card.closed { border-left: 5px solid #9ca3af; background-color: #f9fafb; }
+
+.batch-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }
-.notification-bar a {
-  text-decoration: underline;
+
+.batch-id {
+  font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
-}
-.notification-bar button {
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  color: #831843;
-  cursor: pointer;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-/* Header của trang (Courses + Button) */
-.overview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+.batch-status {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
-.overview-header-left h2 {
-  margin: 0;
-  font-size: 1.75rem;
+
+.status-open { background: #d1fae5; color: #059669; }
+.status-closed { background: #e5e7eb; color: #374151; }
+
+.batch-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
   color: #111827;
 }
-.overview-header-left p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #6b7280;
+
+.batch-info .info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+  font-size: 0.95rem;
 }
-.btn-new-course {
-  background-color: #3730a3; /* Màu tím đậm */
+
+.batch-footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+
+/* Buttons */
+.btn-register-batch {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4f46e5;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 0.75rem 1.25rem;
-  font-weight: 500;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Thanh Tabs (Category) */
-.course-navigation {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-.course-tabs {
-  display: flex;
-  gap: 0.5rem;
-}
-.course-tab {
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-}
-.course-tab.active {
-  background-color: #f3f4f6; /* Màu xám nhạt */
-  border-color: #f3f4f6;
-}
-.view-toggles {
-  display: flex;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-.toggle-btn {
-  padding: 0.5rem;
-  border: none;
-  background: #ffffff;
-  cursor: pointer;
-  color: #6b7280;
-}
-.toggle-btn.active {
-  background-color: #f3f4f6;
-  color: #111827;
-}
-.toggle-btn:first-child {
-  border-top-left-radius: 7px;
-  border-bottom-left-radius: 7px;
-  border-right: 1px solid #d1d5db;
-}
-
-/* Lưới các khóa học */
-.course-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cột */
-  gap: 1.5rem;
-}
-.course-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-.card-image-placeholder {
-  height: 180px;
-  background-color: #f3f4f6; /* Nền xám cho ảnh */
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: #9ca3af;
-  /* (Đây là nơi bạn sẽ đặt ảnh illustration) */
-}
-.card-tag {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-.card-content {
-  padding: 1.25rem;
-}
-.card-title {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
   font-weight: 600;
-  color: #111827;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-.card-meta {
+.btn-register-batch:hover { background-color: #4338ca; }
+
+.btn-disabled {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #d1d5db;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-container {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 1rem;
+  align-items: center;
+  background-color: #f9fafb;
 }
-.card-meta div {
-  flex: 1;
+
+.modal-header h3 { margin: 0; font-size: 1.1rem; color: #111827; }
+.btn-close { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #6b7280; }
+
+.modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-.card-meta label {
-  display: block;
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
+
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: #374151; }
+.form-select, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
 }
-.card-meta span {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #111827;
+.form-select:focus, textarea:focus { outline: none; border-color: #4f46e5; ring: 2px solid #eef2ff; }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
-.card-meta .status {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-.status-published {
-  background-color: #d1fae5;
-  color: #059669;
-}
-.status-unpublished {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
+
+.btn-cancel { padding: 0.6rem 1rem; background: white; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; }
+.btn-submit { padding: 0.6rem 1rem; background: #059669; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.btn-submit:disabled { background: #6ee7b7; cursor: not-allowed; }

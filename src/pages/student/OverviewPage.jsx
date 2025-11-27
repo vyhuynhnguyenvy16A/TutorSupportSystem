@@ -1,169 +1,249 @@
-// src/pages/OverviewPage/OverviewPage.jsx
+// src/pages/student/OverviewPage.jsx
 
-import React from 'react';
-// <-- THÊM MỚI: Imports cho Sidebar/Header
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  FiHome, FiCalendar, FiPlusSquare, FiSettings,
-  FiSearch, FiPlus, FiBell 
+  FiHome, FiCalendar, FiPlusSquare, FiSettings, 
+  FiSearch, FiBell, FiCheckCircle, FiClock, FiX
 } from 'react-icons/fi';
-import hcmutLogo from '../../assets/hcmut.png'; 
+import dashboardPreview from '../../assets/hcmut.png'; 
+import './SchedulePage.css'; // Dùng chung layout sidebar
+import './OverviewPage.css'; // CSS riêng cho trang này
 
-// <-- THÊM MỚI: Icons cho trang Courses
-import { FiGrid, FiList, FiPlus as FiPlusCourse } from 'react-icons/fi';
-
-// <-- THÊM MỚI: Import CẢ HAI file CSS
-// 1. CSS cho layout (sidebar, header)
-import './SchedulePage.css'; 
-// 2. CSS cho nội dung (các thẻ courses)
-import './OverviewPage.css'; 
-
-// <-- THÊM MỚI: Dữ liệu giả cho các khóa học
-const mockCourses = [
-  {
-    tag: 'UI/UX Design',
-    title: 'UI/UX Design Level Up with Prototyping',
-    date: '16 Jan 2025',
-   
-    status: 'Unknown'
-  },
-  {
-    tag: 'Graphic Design',
-    title: 'Graphic Design Masterclass using Adobe Illustration',
-    date: '14 Jan 2025',
-   
-    status: 'Unknown'
-  },
-  {
-    tag: 'Animation',
-    title: 'Fundamental 2D Animation Using Jitter',
-    date: '13 Jan 2025',
-  
-    status: 'Unknown'
-  },
-];
-
+import { submitRegistration } from '../../api/studentService';
+import { getPairingBatches, getFields } from '../../api/publicService';
 
 const OverviewPage = () => {
+  // State dữ liệu
+  const [batches, setBatches] = useState([]);
+  const [fields, setFields] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // State cho Modal đăng ký
+  const [showModal, setShowModal] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  
+  // State Form
+  const [formData, setFormData] = useState({
+    linhVucId: '',
+    nhuCauHoTro: '',
+    thanhTich: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // --- 1. FETCH DỮ LIỆU ---
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        // Gọi song song 2 API lấy Đợt và Lĩnh vực
+        const [batchRes, fieldRes] = await Promise.all([
+          getPairingBatches(),
+          getFields()
+        ]);
+
+        if (batchRes && batchRes.meta) {
+          setBatches(batchRes.meta);
+        }
+
+        // Xử lý Lĩnh vực: Vì API trả về mảng string, ta tạm map index+1 thành ID
+        if (fieldRes && fieldRes.meta && fieldRes.meta.resultList) {
+          const mappedFields = fieldRes.meta.resultList.map((name, index) => ({
+            id: index + 1, // <--- LƯU Ý: Backend nên trả về ID thật
+            name: name
+          }));
+          setFields(mappedFields);
+        }
+
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // --- 2. HELPERS ---
+  const formatDate = (isoString) => {
+    if (!isoString) return '';
+    return new Date(isoString).toLocaleDateString('vi-VN');
+  };
+
+  // Kiểm tra trạng thái: API bạn trả về "M_" hoặc "ng"
+  const isOpen = (status) => status && status.startsWith('M'); 
+
+  // --- 3. HANDLERS ---
+  const handleOpenRegister = (batch) => {
+    setSelectedBatch(batch);
+    setFormData({ linhVucId: '', nhuCauHoTro: '', thanhTich: '' }); // Reset form
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.linhVucId) {
+      alert("Vui lòng chọn lĩnh vực mong muốn!");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      
+      const payload = {
+        dotId: selectedBatch.DOTID,
+        linhVucId: parseInt(formData.linhVucId),
+        nhuCauHoTro: formData.nhuCauHoTro,
+        thanhTich: formData.thanhTich
+      };
+
+      console.log("Nộp đơn:", payload);
+      await submitRegistration(payload);
+      
+      alert("Nộp đơn đăng ký thành công!");
+      setShowModal(false);
+
+    } catch (error) {
+      console.error(error);
+      alert("Có lỗi xảy ra khi nộp đơn.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="dashboard-page-container">
-      
-      {/* 1. THANH BÊN TRÁI (SIDEBAR) - (Giữ nguyên) */}
+      {/* SIDEBAR (Giữ nguyên) */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-logo">
-          <img src={hcmutLogo} alt="Logo" />
+          <img src={dashboardPreview} alt="Logo" />
           <span>Hệ thống Lịch</span>
         </div>
         <nav className="sidebar-nav">
-          {/* Link này sẽ tự động active */}
-          <NavLink to="/app/overview" className="nav-link">
-            <FiHome />
-            <span>Tổng quan</span>
-          </NavLink>
-          <NavLink to="/app/schedule" className="nav-link">
-            <FiCalendar />
-            <span>Lịch</span>
-          </NavLink>
-          <NavLink to="/app/register-schedule" className="nav-link">
-            <FiPlusSquare />
-            <span>Đăng kí lịch</span>
-          </NavLink>
-          <NavLink to="/app/settings" className="nav-link">
-            <FiSettings />
-            <span>Cài đặt</span>
-          </NavLink>
+          <NavLink to="/app/overview" className="nav-link"><FiHome /><span>Tổng quan</span></NavLink>
+          <NavLink to="/app/schedule" className="nav-link"><FiCalendar /><span>Lịch</span></NavLink>
+          <NavLink to="/app/register-schedule" className="nav-link"><FiPlusSquare /><span>Đăng kí lịch</span></NavLink>
+          <NavLink to="/app/settings" className="nav-link"><FiSettings /><span>Cài đặt</span></NavLink>
         </nav>
       </aside>
 
-      {/* 2. KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) */}
+      {/* MAIN CONTENT */}
       <div className="dashboard-main-content">
-        
-        {/* 2.1 HEADER (Giữ nguyên) */}
         <header className="dashboard-header">
-          {/* <-- SỬA ĐỔI: Đổi tiêu đề --> */}
-          <h1 className="header-title">Tổng quan</h1>
-          <div className="header-search">
-            <FiSearch />
-            <input type="text" placeholder="Tìm kiếm..." />
-          </div>
+          <h1 className="header-title">Các đợt đăng ký Tutor</h1>
           <div className="header-actions">
-            <button className="btn-icon btn-plus"><FiPlus /></button>
             <button className="btn-icon"><FiBell /></button>
             <div className="user-profile">
+               {/* Avatar mẫu */}
               <img src="https://via.placeholder.com/40" alt="Avatar" />
-              <div className="user-info">
-                <span>Darrell Steward</span>
-                <small>Super Admin</small>
-              </div>
+              <div className="user-info"><span>Sinh viên</span></div>
             </div>
           </div>
         </header>
 
-        {/* 2.2 NỘI DUNG TRANG (Đã thay đổi) */}
         <main className="dashboard-page-content">
           
-          {/* <-- THÊM MỚI: Thanh thông báo (Màu hồng) --> */}
-          <div className="notification-bar">
-            <span>You have <strong>30 days</strong> to join Software Engineer Class <a>Join Now</a></span>
-            <button>&times;</button>
+          <div className="overview-intro">
+            <h2>Danh sách đợt đăng ký</h2>
+            <p>Chọn đợt đăng ký đang mở để nộp hồ sơ tìm Tutor.</p>
           </div>
 
-          {/* <-- THÊM MỚI: Header của trang Courses --> */}
-          <div className="overview-header">
-            <div className="overview-header-left">
-              <h2>Courses</h2>
-              <p>Create and manage courses in your school.</p>
-            </div>
-            <button className="btn-new-course">
-              <FiPlusCourse /> New Course
-            </button>
-          </div>
-
-          {/* <-- THÊM MỚI: Thanh Tabs (Category) --> */}
-          <div className="course-navigation">
-            <div className="course-tabs">
-              <button className="course-tab active">All Category</button>
-              <button className="course-tab">UI/UX Design</button>
-              <button className="course-tab">Graphic Design</button>
-              <button className="course-tab">Animation</button>
-              <button className="course-tab">Web Development</button>
-            </div>
-            <div className="view-toggles">
-              <button className="toggle-btn active"><FiGrid /></button>
-              <button className="toggle-btn"><FiList /></button>
-            </div>
-          </div>
-
-          {/* <-- THÊM MỚI: Lưới các khóa học --> */}
-          <div className="course-grid">
-            {mockCourses.map((course, index) => (
-              <div className="course-card" key={index}>
-                <div className="card-image-placeholder">
-                  {/* (Đây là nơi bạn đặt ảnh illustration) */}
-                  <span className="card-tag">{course.tag}</span>
-                </div>
-                <div className="card-content">
-                  <h4 className="card-title">{course.title}</h4>
-                  <div className="card-meta">
-                    <div>
-                      <label>Creation Date</label>
-                      <span>{course.date}</span>
+          {isLoading ? <p>Đang tải dữ liệu...</p> : (
+            <div className="batch-grid">
+              {batches.map((batch) => (
+                <div key={batch.DOTID} className={`batch-card ${isOpen(batch.TRANGTHAI) ? 'open' : 'closed'}`}>
+                  <div className="batch-header">
+                    <span className="batch-id">#{batch.DOTID}</span>
+                    <span className={`batch-status ${isOpen(batch.TRANGTHAI) ? 'status-open' : 'status-closed'}`}>
+                      {isOpen(batch.TRANGTHAI) ? 'Đang Mở' : 'Đã Đóng'}
+                    </span>
+                  </div>
+                  
+                  <h3 className="batch-title">{batch.TENDOT}</h3>
+                  
+                  <div className="batch-info">
+                    <div className="info-row">
+                      <FiCheckCircle /> <span>Bắt đầu: {formatDate(batch.NGAYBATDAU)}</span>
                     </div>
-                    
-                    <div>
-                      <label>Status</label>
-                      <span className={`status ${course.status === 'Ready' ? 'Not-ready' : 'Unknown'}`}>
-                        {course.status}
-                      </span>
+                    <div className="info-row">
+                      <FiClock /> <span>Kết thúc: {formatDate(batch.NGAYKETTHUC)}</span>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
 
+                  <div className="batch-footer">
+                    {isOpen(batch.TRANGTHAI) ? (
+                      <button className="btn-register-batch" onClick={() => handleOpenRegister(batch)}>
+                        Đăng ký ngay
+                      </button>
+                    ) : (
+                      <button className="btn-disabled" disabled>
+                        Đã đóng
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </main>
       </div>
+
+      {/* --- MODAL ĐĂNG KÝ --- */}
+      {showModal && selectedBatch && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h3>Đăng ký: {selectedBatch.TENDOT}</h3>
+              <button className="btn-close" onClick={() => setShowModal(false)}><FiX /></button>
+            </div>
+            
+            <form className="modal-body" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Chọn Lĩnh vực mong muốn (*)</label>
+                <select 
+                  className="form-select" 
+                  value={formData.linhVucId} 
+                  onChange={(e) => setFormData({...formData, linhVucId: e.target.value})}
+                  required
+                >
+                  <option value="">-- Chọn lĩnh vực --</option>
+                  {fields.map(f => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Nhu cầu hỗ trợ</label>
+                <textarea 
+                  rows="3" 
+                  placeholder="Ví dụ: Em bị mất gốc môn này, cần tutor ôn tập lại từ đầu..."
+                  value={formData.nhuCauHoTro}
+                  onChange={(e) => setFormData({...formData, nhuCauHoTro: e.target.value})}
+                ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label>Thành tích / Điểm số liên quan</label>
+                <textarea 
+                  rows="2" 
+                  placeholder="Ví dụ: GPA kỳ trước 3.5, điểm Toán A..."
+                  value={formData.thanhTich}
+                  onChange={(e) => setFormData({...formData, thanhTich: e.target.value})}
+                ></textarea>
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Hủy</button>
+                <button type="submit" className="btn-submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Đang gửi...' : 'Nộp đơn đăng ký'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
