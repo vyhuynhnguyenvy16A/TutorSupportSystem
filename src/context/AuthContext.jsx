@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_URL = "http://localhost:3000/api/auth";
+  const API_URL = "http://localhost:3069/auth";
 
   useEffect(() => {
     const checkUserStatus = () => {
@@ -19,11 +19,11 @@ export const AuthProvider = ({ children }) => {
         if (token) {
           const decodedUser = jwtDecode(token);
           
-          const isExpired = decodedUser.exp * 1000 < Date.now();
-          if (isExpired) {
-            logout(); // Xóa token hết hạn
-            return;
-          }
+          // const isExpired = decodedUser.exp * 1000 < Date.now();
+          // if (isExpired) {
+          //   logout(); // Xóa token hết hạn
+          //   return;
+          // }
 
           // 2. Cập nhật state
           setUser(decodedUser);
@@ -40,22 +40,24 @@ export const AuthProvider = ({ children }) => {
     checkUserStatus();
   }, []);
 
-  const login = async (email, password) => {
+ const login = async (email, password) => {
     try {
       const res = await axios.post(`${API_URL}/login`, {
         email,
         password,
       });
 
-      const token = res.data.token;
+      console.log(res)
+
+      const token = res.data.meta.token;
       localStorage.setItem("token", token);
 
       const decodedUser = jwtDecode(token);
       console.log("Token đã giải mã:", decodedUser);
       setUser(decodedUser);
       setIsLoggedIn(true);
-      alert("Đăng nhập thành công!");
-      return true;
+
+      return decodedUser;
     } catch (err) {
       const message = err.response?.data?.message || "Đăng nhập thất bại!";
       alert(message);

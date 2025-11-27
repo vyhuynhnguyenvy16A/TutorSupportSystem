@@ -5,7 +5,7 @@ import React from 'react';
 import './SettingsPage.css'; 
 import { NavLink } from 'react-router-dom';
 // <-- THÊM MỚI: Dùng avatar mẫu, bạn có thể thay bằng logo hcmut
-import dashboardPreview from '../assets/hcmut.png'; 
+import dashboardPreview from '../../assets/hcmut.png'; 
 // <-- THÊM MỚI: Icon cho cảnh báo
 
 import './SchedulePage.css'; 

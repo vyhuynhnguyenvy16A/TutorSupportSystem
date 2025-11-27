@@ -12,7 +12,7 @@ import {
   FiSearch, FiPlus, FiBell, FiDownload
 } from 'react-icons/fi';
 // <-- THÊM MỚI: Import logo
-import dashboardPreview from '../assets/hcmut.png';
+import dashboardPreview from '../../assets/hcmut.png';
 
 // Dữ liệu giả cho bảng
 const mockRegistrations = [

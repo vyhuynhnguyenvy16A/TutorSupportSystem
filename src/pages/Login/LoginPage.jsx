@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css'; // Import file CSS
 
+import { useAuth } from '../../context/AuthContext';
+
 // Import icons
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
@@ -11,6 +13,7 @@ import { FaApple } from 'react-icons/fa';
 
 
 import dashboardPreview from '../../assets/hcmut.png';
+import { use } from 'react';
 
 const LoginPage = () => {
   // State cho input
@@ -21,7 +24,13 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // state loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate(); // Dùng để chuyển trang sau khi login
+
+  // lấy login từ AuthContext
+  const { login } = useAuth();
 
   // --- LOGIC VALIDATION ---
   const validateForm = () => {
@@ -37,8 +46,8 @@ const LoginPage = () => {
     // Kiểm tra Password
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     setErrors(newErrors);
@@ -48,37 +57,36 @@ const LoginPage = () => {
   };
 
   // --- LOGIC SUBMIT FORM ---
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Ngăn form reload trang
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
 
     // 1. Kiểm tra lỗi client-side
     if (!validateForm()) {
-      return; // Dừng lại nếu validation thất bại
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    const userData = await login(email, password);
+
+    if (!userData){
+      setErrors({api: "Đăng nhập thất bại"})
     }
 
     // 2. Nếu validation OK, mô phỏng gọi API
     console.log('Submitting:', { email, password });
 
-    // --- MÔ PHỎNG XỬ LÝ LỖI TỪ SERVER ---
-    // (Đây là nơi bạn sẽ gọi API thật)
-    
-    // Giả sử: server trả về lỗi "Sai mật khẩu"
-    const FAKE_ADMIN_EMAIL = 'admin@gmail.com';
-    const FAKE_ADMIN_PASSWORD = 'password123';
+    const role = userData.role;
 
-    // 3. Kiểm tra dữ liệu nhập
-    if (email === FAKE_ADMIN_EMAIL && password === FAKE_ADMIN_PASSWORD) {
-      // 4. ĐĂNG NHẬP THÀNH CÔNG
-      alert('Đăng nhập thành công! Đang chuyển đến trang Lịch...');
-      
-      // <-- SỬA ĐỔI QUAN TRỌNG: Chuyển hướng đến trang /app/schedule
-      navigate('/app/schedule'); 
-      
-    } else {
-      // 5. ĐĂNG NHẬP THẤT BẠI
-      // Hiển thị lỗi chung (như từ server trả về)
-      setErrors({ api: 'Email hoặc mật khẩu không đúng.' });
+    if (role == "TUTOR"){
+      navigate('/app/tutor/overview')
+    } else if (role == "STUDENT"){
+      navigate('/app/overview')
     }
+
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -111,6 +119,7 @@ const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className={errors.email ? 'input-error' : ''}
                 placeholder="sellostore@company.com"
+                disabled={isSubmitting}
               />
               {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
@@ -126,6 +135,7 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className={errors.password ? 'input-error' : ''}
                   placeholder="5ellostore."
+                  disabled={isSubmitting}
                 />
                 <span
                   className="password-toggle-icon"
@@ -150,8 +160,8 @@ const LoginPage = () => {
             </div>
 
             {/* --- Nút Log In --- */}
-            <button type="submit" className="btn-login">
-              Log In
+            <button type="submit" className="btn-login" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in..' : "Log In"}
             </button>
           </form>
 

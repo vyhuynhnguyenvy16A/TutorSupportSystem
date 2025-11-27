@@ -7,7 +7,7 @@ import {
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell 
 } from 'react-icons/fi';
-import hcmutLogo from '../assets/hcmut.png'; 
+import hcmutLogo from '../../assets/hcmut.png'; 
 
 // <-- THÊM MỚI: Icons cho trang Courses
 import { FiGrid, FiList, FiPlus as FiPlusCourse } from 'react-icons/fi';

@@ -7,10 +7,10 @@ import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx';
 import HomePage from '../pages/user_homepage/HomePage.jsx';
 import LoginPage from '../pages/Login/LoginPage.jsx';
 import ForgotPasswordPage from '../pages/ForgotPassword.jsx';
-import SchedulePage from '../pages/SchedulePage.jsx';
+import SchedulePage from '../pages/student/SchedulePage.jsx';
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
-import SettingsPage from '../pages/SettingsPage.jsx';
-import OverviewPage from '../pages/OverviewPage.jsx';
+import SettingsPage from '../pages/student/SettingsPage.jsx';
+import OverviewPage from '../pages/student/OverviewPage.jsx';
 
 import TutorOverviewPage from '../pages/tutor/TutorOverviewPage.jsx';
 import TutorSchedulePage from '../pages/tutor/TutorSchedulePage.jsx';
