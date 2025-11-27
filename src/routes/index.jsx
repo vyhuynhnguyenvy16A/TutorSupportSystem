@@ -11,11 +11,13 @@ import SchedulePage from '../pages/student/SchedulePage.jsx';
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
 import SettingsPage from '../pages/student/SettingsPage.jsx';
 import OverviewPage from '../pages/student/OverviewPage.jsx';
-
+import Dashboard from '../pages/admin/Dashboard.jsx';
 import TutorOverviewPage from '../pages/tutor/TutorOverviewPage.jsx';
 import TutorSchedulePage from '../pages/tutor/TutorSchedulePage.jsx';
 import TutorSlotsPage from '../pages/tutor/TutorSlotsPage.jsx';
 import TutorSettingsPage from '../pages/tutor/TutorSettingsPage.jsx';
+
+import ProtectedRoute from './protectedRoute.jsx';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -34,19 +36,23 @@ const AppRoutes = () => {
       <Route path="/app/schedule" element={<SchedulePage />} />
 
       {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
-      <Route path="/app/overview" element={<OverviewPage />} />
-      <Route path="/app/register-schedule" element={<div>Trang Đăng Kí Lịch</div>} />
-      <Route path="/app/settings" element={<SettingsPage />} />
+      <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
+        <Route path="/app/overview" element={<OverviewPage />} />
+        <Route path="/app/schedule" element={<SchedulePage />} />
+        <Route path="/app/settings" element={<SettingsPage />} />
+      </Route>
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
       
       <Route path="/admin" element={<Dashboard />} />
 
       {/* <-- 2. THÊM 4 ROUTES MỚI CHO TUTOR (GIẢNG VIÊN) VÀO ĐÂY --> */}
-      <Route path="/app/tutor/overview" element={<TutorOverviewPage />} />
-      <Route path="/app/tutor/schedule" element={<TutorSchedulePage />} />
-      <Route path="/app/tutor/slots" element={<TutorSlotsPage />} />
-      <Route path="/app/tutor/settings" element={<TutorSettingsPage />} />
+      <Route element={<ProtectedRoute allowedRoles={["TUTOR"]} />}>
+        <Route path="/app/tutor/overview" element={<TutorOverviewPage />} />
+        <Route path="/app/tutor/schedule" element={<TutorSchedulePage />} />
+        <Route path="/app/tutor/slots" element={<TutorSlotsPage />} />
+        <Route path="/app/tutor/settings" element={<TutorSettingsPage />} />
+      </Route>
     </Routes>
   );
 };

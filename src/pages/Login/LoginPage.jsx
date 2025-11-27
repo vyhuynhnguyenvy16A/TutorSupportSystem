@@ -12,7 +12,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
 
 import dashboardPreview from '../../assets/hcmut.png';
-import { use } from 'react';
 
 const LoginPage = () => {
   // State cho input

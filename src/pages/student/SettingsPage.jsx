@@ -1,6 +1,6 @@
 // src/pages/SettingsPage/SettingsPage.jsx
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // <-- THÊM MỚI: File CSS riêng cho trang Cài đặt
 import './SettingsPage.css'; 
 import { NavLink } from 'react-router-dom';
@@ -13,25 +13,88 @@ import {
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell, FiAlertOctagon
 } from 'react-icons/fi';
+
+import { getStudentProfile } from '../../api/studentService.js';
 const SettingsPage = () => {
-  // Dữ liệu giả cho hồ sơ sinh viên (bạn sẽ thay bằng API sau)
-  const studentProfile = {
+
+  const [profile, setProfile] = useState({
     photo: dashboardPreview,
-    name: 'Gorde Omkar',
-    age: 22,
-    mssv: '2311044',
-    cccd: '046205009192',
-    dob: '1 January 2022',
-    gender: 'Male',
-    mobile: '+91 9876543210',
-    email: 'omkargorde1005@gmail.com',
-    nationality: 'Indian',
-    address: '254, Nurshina Co. Society, L.B.S. marg, Bhandup...',
-    city: 'Mumbai',
-    pincode: '400078',
+    name: "Loading..",
+    age: '',
+    mssv: '',
+    cccd: '',
+    dob: '',
+    gender: '',
+    mobile: '',
+    email: '',
+    nationality: '',
+    city: '',
+    birthday: '',
+    trangthai: '',
+    lichranh: '',
+  })
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    // Sử dụng 'vi-VN' để có định dạng ngày/tháng/năm
+    return date.toLocaleDateString('vi-VN'); 
   };
 
- 
+  // --- HÀM HELPER: Tính tuổi từ ngày sinh ---
+  const calculateAge = (isoString) => {
+    if (!isoString) return '';
+    const birthDate = new Date(isoString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age.toString();
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try{
+        setIsLoading(true);
+        const response = await getStudentProfile();
+
+        console.log("Dữ liệu lấy từ API ", response)
+
+        const data = response.meta.studentInfo;
+
+        setProfile(prev => ({
+          ...prev,
+
+          name: data.fullname,
+          mssv: data.mssv,
+          email: data.email,
+          mobile: data.phone,
+          birthday: formatDate(data.birthday),
+          address: data.address,
+          cccd: data.cccd,
+          age: calculateAge(data.birthday), // Giá trị mặc định nếu API thiếu
+          gender: data.gender,
+          trangthai: data.tinhtrang,
+          nationality: data.nationality || 'Vietnam',
+          city: data.city || 'Ho Chi Minh',
+          lichranh: data.lichranh || "Chưa thiết lập",
+        }))
+
+      } catch(err){
+        console.error(err);
+        setError("Không thể tải thông tin sinh viên")
+      } finally {
+        setIsLoading(true)
+      }
+    };
+
+    fetchProfile();
+  }, [])
 
   return (
     <div className="dashboard-page-container">
@@ -103,58 +166,58 @@ const SettingsPage = () => {
                 <h3 className="section-title">Personal Details</h3>
                 <div className="avatar-section">
                   <span>Photo:</span>
-                  <img src={studentProfile.photo} alt="Student Avatar" />
+                  <img src={profile.photo} alt="Student Avatar" />
                 </div>
                 <div className="form-field-row">
                   <label>Name:</label>
-                  <div className="field-value">{studentProfile.name}</div>
+                  <div className="field-value">{profile.name}</div>
                 </div>
                 <div className="form-field-row">
                   <label>MSSV (Mã số sinh viên):</label>
-                  <div className="field-value">{studentProfile.mssv}</div>
+                  <div className="field-value">{profile.mssv}</div>
                 </div>
                 <div className="form-field-row">
                   <label>CCCD (Căn cước công dân):</label>
-                  <div className="field-value">{studentProfile.cccd}</div>
+                  <div className="field-value">{profile.cccd}</div>
                 </div>
                 <div className="form-field-row">
                   <label>Age:</label>
-                  <div className="field-value">{studentProfile.age}</div>
+                  <div className="field-value">{profile.age}</div>
                 </div>
                 <div className="form-field-row">
                   <label>Date of Birth:</label>
-                  <div className="field-value">{studentProfile.dob}</div>
+                  <div className="field-value">{profile.birthday}</div>
                 </div>
                 <div className="form-field-row">
                   <label>Gender:</label>
-                  <div className="field-value">{studentProfile.gender}</div>
+                  <div className="field-value">{profile.gender}</div>
                 </div>
               </div>
               <div className="profile-section">
                 <h3 className="section-title">Contact Details</h3>
                 <div className="form-field-row">
                   <label>Mobile Number:</label>
-                  <div className="field-value">{studentProfile.mobile}</div>
+                  <div className="field-value">{profile.mobile}</div>
                 </div>
                 <div className="form-field-row">
                   <label>Email Address:</label>
-                  <div className="field-value">{studentProfile.email}</div>
+                  <div className="field-value">{profile.email}</div>
                 </div>
                 <div className="form-field-row">
                   <label>Nationality:</label>
-                  <div className="field-value">{studentProfile.nationality}</div>
+                  <div className="field-value">{profile.nationality}</div>
                 </div>
                 <div className="form-field-row-full">
-                  <label>Permanent Address:</label>
-                  <div className="field-value">{studentProfile.address}</div>
+                  <label>Trạng Thái Tìm Tutor:</label>
+                  <div className="field-value">{profile.trangthai}</div>
                 </div>
                 <div className="form-field-row">
                   <label>City:</label>
-                  <div className="field-value">{studentProfile.city}</div>
+                  <div className="field-value">{profile.city}</div>
                 </div>
                 <div className="form-field-row">
-                  <label>Pincode:</label>
-                  <div className="field-value">{studentProfile.pincode}</div>
+                  <label>Lịch rảnh:</label>
+                  <div className="field-value">{profile.lichranh}</div>
                 </div>
               </div>
             </div>

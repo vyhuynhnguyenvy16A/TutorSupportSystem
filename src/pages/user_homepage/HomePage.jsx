@@ -1,8 +1,7 @@
 // src/pages/HomePage.jsx
 
-import React from 'react';
-import Navbar from '../../Components/Layout/Navbar.jsx';
-import Hero from '../../Components/Layout/Hero.jsx';
+import Navbar from '../../components/Layout/Navbar.jsx';
+import Hero from '../../components/Layout/Hero.jsx';
 
 // (Tùy chọn) import các section khác của trang chủ
 // import Features from '../../components/Features/Features';
