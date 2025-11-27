@@ -73,24 +73,21 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const register = async (email, password, name) => {
+  const register = async (userData) => {
     try {
-      const res = await axios.post(`${API_URL}/register`, {
-        email,
-        password,
-        name,
-      });
-
-      alert(res.data.message || "Đăng ký thành công! Vui lòng đăng nhập.");
-      return true; 
+      // Gửi toàn bộ dữ liệu form lên endpoint /auth/register
+      const res = await axios.post(`${API_URL}/register`, userData);
+      
+      // Backend trả về message thành công
+      return { success: true, message: res.data.message };
 
     } catch (err) {
-      const message = err.response?.data?.message || "Đăng ký thất bại!";
-      alert(message);
-      console.error(err);
-      return false;
+      console.error("Register Error:", err);
+      const message = err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+      return { success: false, message };
     }
   };
+
 
   return (
     <AuthContext.Provider value={{ user, isLoggedIn, isLoading, login, logout, register }}>

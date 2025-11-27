@@ -18,3 +18,18 @@ export const getStudentProfile = async () => {
 
   return response.data;
 };
+
+export const updateStudentProfile = async (updatedData) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error("No access token found");
+
+  // updatedData cần đúng format: { hoTen, ngaySinh, gioiTinh, soCMND, soDienThoai, lichranh }
+  const response = await axios.put(`${API_URL}/student/profile`, updatedData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.data;
+};
