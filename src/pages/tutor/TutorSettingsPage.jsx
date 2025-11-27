@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './TutorSettingsPage.css';
 import dashboardPreview from '../../assets/hcmut.png'; 
@@ -6,32 +6,102 @@ import {
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell, FiCamera, FiEdit2, FiSave, FiX
 } from 'react-icons/fi';
-
+import { set } from 'react-hook-form';
+import { getTutorProfile, updateTutorProfile } from '../../api/tutorService';
+import { meta } from '@eslint/js';
 const TutorSettingsPage = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef(null);
+
+  const formatDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return isNaN(date.getTime()) ? '' : date.toLocaleDateString('vi-VN'); 
+  };
+  
+  const formatInputDate = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+  };
+
+  const calculateAge = (isoString) => {
+    if (!isoString) return '';
+    const birthDate = new Date(isoString);
+    if (isNaN(birthDate.getTime())) return '';
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age.toString();
+  };
 
   // Mock State Profile
   const [profile, setProfile] = useState({
-    photo: dashboardPreview,
-    name: 'Jane Doe',
-    age: 35,
-    msgv: 'GV10293',
-    cccd: '012345678910',
-    dob: '1990-03-10', // Format YYYY-MM-DD for input date
-    gender: 'Female',
-    mobile: '+84 909123456',
-    email: 'jane.doe@hcmut.edu.vn',
-    nationality: 'Vietnamese',
-    address: '123, Đường ABC, Phường XYZ, Quận 1, TP.HCM',
-    city: 'Hồ Chí Minh',
-    pincode: '700000',
-  });
+      photo: dashboardPreview,
+      name: "Loading..",
+      age: '',
+      msgv: '',
+      cccd: '',
+      dob: '',       // Hiển thị (DD/MM/YYYY)
+      rawDob: '',    // Value cho input date (YYYY-MM-DD)
+      gender: '',
+      mobile: '',
+      email: '',
+      nationality: '',
+      city: '',
+      trangthai: '',
+      lichranh: '',
+      address: '',
+      bomon: '',
+      bangcap: '',
+    });
+  const [tempProfile, setTempProfile] = useState(profile);
+  // Fetch Data:
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getTutorProfile();
 
+        if(response && response.meta && response.meta.tutorInfo) {
+          const data = response.meta.tutorInfo;
+          setProfile(prev => ({
+            ...prev,
+            name: data.hoten || '',
+            msgv: data.msgv || '',
+            email: data.email || '',
+            mobile: data.SDT || '',
+            dob: formatDate(data.NGAYSINH) || '',
+            rawDob: formatInputDate(data.NGAYSINH) || '',
+            trangthai: data.TRANGTHAI || '',
+            lichranh: data.LICHRANH || '',
+            bangcap: data.BANGCAP || '',
+            bomon: data.BOMON || '',
+            gender: data.GIOITINH || '',
+            cccd: data.CMND || ''
+          }))
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
   // Handle Input Change
   const handleChange = (e) => {
+    // Lưu tạm vào một tempProfile cho trang web.
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    setTempProfile(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   // Handle Avatar Change
@@ -43,9 +113,54 @@ const TutorSettingsPage = () => {
     }
   };
 
+  const handleEditClick = () => {
+    setTempProfile({...profile});
+    setIsEditing(true);
+  }
   // Handle Save/Cancel
-  const handleSave = () => setIsEditing(false);
-  const handleCancel = () => setIsEditing(false); // Trong thực tế sẽ reset về state cũ
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+
+      if(tempProfile.cccd.length < 12) {
+        alert("CMND phải có đúng 12 số!");
+        throw "err";
+      }
+
+      if(tempProfile.mobile.lenght < 10) {
+        alert("Số điện thoại phải có 10 chữ số!");
+        throw "err";
+      }
+
+      const payload = {
+        hoTen: tempProfile.name,
+        ngaySinh: formatInputDate(tempProfile.rawDob),
+        gioiTinh: tempProfile.gender,
+        soCMND: tempProfile.cccd,
+        soDienThoai : tempProfile.mobile,
+        BOMON: tempProfile.bomon,
+        BANGCAP: tempProfile.bangcap,
+        TRANGTHAI: tempProfile.trangthai,
+        LICHRANH_TEXT: tempProfile.lichranh
+      }
+      
+      await updateTutorProfile(payload);
+
+      setProfile(tempProfile);
+
+      alert("Cập nhật thành công!");
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Update error:" , err);
+      alert("Cập nhật thất bại!. Vui lòng thử lại.",err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    setIsEditing(false); // Trong thực tế sẽ reset về state cũ
+  }
 
   return (
     <div className="dashboard-page-container">
@@ -82,7 +197,7 @@ const TutorSettingsPage = () => {
                 <div className="section-title">
                   <h3>Thông tin cá nhân</h3>
                   {!isEditing ? (
-                    <button className="tutor-btn-edit" onClick={() => setIsEditing(true)}>
+                    <button className="tutor-btn-edit" onClick={handleEditClick}>
                       <FiEdit2 /> Chỉnh sửa
                     </button>
                   ) : (
@@ -109,33 +224,54 @@ const TutorSettingsPage = () => {
                     />
                   </div>
                 </div>
-
+                <h3 className="section-title" style={{marginTop: '2rem'}}>Thông tin cơ bản</h3>
+                
                 <div className="form-field-row">
                   <label>Họ tên:</label>
-                  {isEditing ? <input className="tutor-input" name="name" value={profile.name} onChange={handleChange}/> : <div className="field-value">{profile.name}</div>}
-                </div>
-                <div className="form-field-row">
-                  <label>MSGV:</label>
-                  <div className="field-value" style={{backgroundColor: '#f3f4f6', color:'#9ca3af'}}>{profile.msgv} (Không thể sửa)</div>
+                  {isEditing ? <input className="tutor-input" name="name" value={tempProfile.name} onChange={handleChange}/> : <div className="field-value">{profile.name}</div>}
                 </div>
                 <div className="form-field-row">
                   <label>Ngày sinh:</label>
-                  {isEditing ? <input className="tutor-input" type="date" name="dob" value={profile.dob} onChange={handleChange}/> : <div className="field-value">{profile.dob}</div>}
+                  {isEditing ? <input className="tutor-input" type="date" name="rawDob" value={tempProfile.rawDob} onChange={handleChange}/> : <div className="field-value">{formatDate(profile.rawDob)}</div>}
                 </div>
-                
+                <div className="form-field-row">
+                  <label>Giới tính</label>
+                  {isEditing ? <input className="tutor-input" name="gender" value={tempProfile.gender} onChange={handleChange}/> : <div className="field-value">{profile.gender}</div>}
+                </div>
+                <div className="form-field-row">
+                  <label>CMND:</label>
+                  {isEditing ? <input className="tutor-input" name="cccd" value={tempProfile.cccd} onChange={handleChange}/> : <div className="field-value">{profile.cccd}</div>}
+                </div>
+
                 <h3 className="section-title" style={{marginTop: '2rem'}}>Liên hệ</h3>
                 
                 <div className="form-field-row">
                   <label>Số điện thoại:</label>
-                  {isEditing ? <input className="tutor-input" name="mobile" value={profile.mobile} onChange={handleChange}/> : <div className="field-value">{profile.mobile}</div>}
+                  {isEditing ? <input className="tutor-input" name="mobile" value={tempProfile.mobile} onChange={handleChange}/> : <div className="field-value">{profile.mobile}</div>}
                 </div>
                 <div className="form-field-row">
                   <label>Email:</label>
-                  {isEditing ? <input className="tutor-input" name="email" value={profile.email} onChange={handleChange}/> : <div className="field-value">{profile.email}</div>}
+                  <div className="field-value" style={{backgroundColor: '#f3f4f6', color:'#9ca3af'}}>{profile.email}</div>
                 </div>
-                <div className="form-field-row-full">
+                {/* <div className="form-field-row-full">
                   <label>Địa chỉ:</label>
                   {isEditing ? <textarea className="tutor-input" rows="2" name="address" value={profile.address} onChange={handleChange}/> : <div className="field-value">{profile.address}</div>}
+                </div> */}
+                <div className="form-field-row-full">
+                  <label>Lĩnh vực</label>
+                  {isEditing ? <textarea className="tutor-input" rows="2" name="linhvuc" value={tempProfile.linhvuc} onChange={handleChange}/> : <div className="field-value">{profile.linhvuc}</div>}
+                </div>
+                <div className="form-field-row-full">
+                  <label>Bộ môn</label>
+                  {isEditing ? <textarea className="tutor-input" rows="2" name="bomon" value={tempProfile.bomon} onChange={handleChange}/> : <div className="field-value">{profile.bomon}</div>}
+                </div>
+                <div className="form-field-row-full">
+                  <label>Bằng cấp</label>
+                  {isEditing ? <textarea className="tutor-input" rows="2" name="bangcap" value={tempProfile.bangcap} onChange={handleChange}/> : <div className="field-value">{profile.bangcap}</div>}
+                </div>
+                <div className="form-field-row-full">
+                  <label>Lịch rảnh</label>
+                  {isEditing ? <textarea className="tutor-input" rows="2" name="lichranh" value={tempProfile.lichranh} onChange={handleChange}/> : <div className="field-value">{profile.lichranh}</div>}
                 </div>
               </div>
             </div>
