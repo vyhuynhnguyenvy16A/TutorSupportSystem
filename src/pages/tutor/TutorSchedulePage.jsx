@@ -1,83 +1,263 @@
 // TutorSchedulePage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './TutorSchedulePage.css'; 
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
-  FiSearch, FiPlus, FiBell, FiDownload
+  FiSearch, FiPlus, FiBell, FiChevronLeft, FiChevronRight, FiX, FiClock, FiMapPin, FiUsers, FiMonitor
 } from 'react-icons/fi';
 import dashboardPreview from '../../assets/hcmut.png';
 
-// Mock Data: Cập nhật field 'quantity' thay vì 'student'
-const upcomingSchedule = [
-  { id: 1, subject: 'Công nghệ phần mềm', quantity: 45, time: '2025-11-25', fullTime: '25/11/2025 09:00', status: 'Đã xác nhận', result: 'Sắp tới' },
-  { id: 2, subject: 'Trí tuệ nhân tạo', quantity: 32, time: '2025-11-26', fullTime: '26/11/2025 10:30', status: 'Chờ sinh viên', result: 'Chờ duyệt' },
-];
-
-const pastSchedule = [
-  { id: 3, subject: 'Mạng máy tính', quantity: 50, time: '2025-10-22', fullTime: '22/10/2025 14:00', status: 'Đã hủy', result: 'Đã hủy' },
-  { id: 4, subject: 'An toàn thông tin', quantity: 28, time: '2025-10-20', fullTime: '20/10/2025 11:00', status: 'Thành công', result: 'Đã dạy' },
-];
-
 const TutorSchedulePage = () => {
-  const [activeTab, setActiveTab] = useState('upcoming');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const [events, setEvents] = useState([]);
+  const [viewMode, setViewMode] = useState('month'); // 'month' | 'week'
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
 
-  // Data Source
-  const currentData = activeTab === 'upcoming' ? upcomingSchedule : pastSchedule;
-
-  // Filter Logic
-  const filteredData = currentData.filter(item => {
-    // Date Filter
-    if (startDate && item.time < startDate) return false;
-    if (endDate && item.time > endDate) return false;
-    
-    // Search Filter
-    if (searchTerm && !item.subject.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    
-    return true;
-  });
-
-  // Search Logic (Consistent UI)
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    // Simple suggestion based on current tab data
-    if (value.length > 0) {
-      const matches = currentData
-        .filter(c => c.subject.toLowerCase().includes(value.toLowerCase()))
-        .map(c => c.subject);
-      setSuggestions([...new Set(matches)]); // Unique
+  // --- 1. DATA LOADING (FROM LOCALSTORAGE) ---
+  useEffect(() => {
+    // Lấy dữ liệu được tạo từ trang SlotsPage
+    const savedSlots = localStorage.getItem('tutor_db_slots');
+    if (savedSlots) {
+      setEvents(JSON.parse(savedSlots));
     } else {
-      setSuggestions([]);
+      // Nếu chưa có, dùng mảng rỗng hoặc sample (tùy chọn)
+      setEvents([]);
+    }
+  }, []);
+
+  // --- 2. CALENDAR UTILS ---
+  const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  
+  const getFirstDayOfMonth = (date) => {
+    const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return day === 0 ? 6 : day - 1; // Chuyển CN (0) thành index 6, T2 là 0
+  };
+
+  const getStartOfWeek = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is sunday
+    return new Date(d.setDate(diff));
+  };
+
+  const addDays = (date, days) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+  // --- 3. NAVIGATION LOGIC ---
+  const handlePrev = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    } else {
+      setCurrentDate(addDays(currentDate, -7));
     }
   };
 
-  const handleSelectSuggestion = (val) => {
-    setSearchTerm(val);
-    setSuggestions([]);
+  const handleNext = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    } else {
+      setCurrentDate(addDays(currentDate, 7));
+    }
   };
 
-  const handleExport = () => {
-    const headers = ["ID,Môn Học,Số Lượng HV,Thời Gian,Trạng Thái,Kết Quả"];
-    const rows = filteredData.map(item => 
-      `${item.id},${item.subject},${item.quantity},${item.fullTime},${item.status},${item.result}`
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // --- 4. EVENT FILTERING ---
+  const getEventsForDay = (dateObj) => {
+    // dateObj là object Date
+    // Format YYYY-MM-DD local để so sánh với data trong localStorage
+    // Lưu ý: data lưu dạng '2025-11-25', cần format dateObj tương tự
+    const year = dateObj.getFullYear();
+    const month =String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const dateKey = `${year}-${month}-${day}`;
+
+    return events.filter(e => e.date === dateKey);
+  };
+
+  // --- 5. MODAL HANDLERS ---
+  const handleDayClick = (dateObj) => {
+    setSelectedDate(dateObj);
+    setIsModalOpen(true);
+  };
+
+  const handleEventClick = (e, event) => {
+    e.stopPropagation();
+    // Logic mở chi tiết 1 sự kiện cụ thể, ở đây ta tái sử dụng modal ngày
+    // nhưng có thể cải tiến để highlight sự kiện đó.
+    // Tạm thời mở modal ngày chứa sự kiện đó.
+    const [y, m, d] = event.date.split('-');
+    const dateObj = new Date(y, m - 1, d);
+    setSelectedDate(dateObj);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDate(null);
+  };
+
+  // --- 6. RENDERERS ---
+
+  // Header cho Grid (T2 -> CN)
+  const renderWeekHeader = () => (
+    <div className="calendar-header-row">
+      {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'].map(day => (
+        <div key={day} className="cal-weekday">{day}</div>
+      ))}
+    </div>
+  );
+
+  const renderMonthView = () => {
+    const daysInMonth = getDaysInMonth(currentDate);
+    const startDayIndex = getFirstDayOfMonth(currentDate);
+    const totalSlots = Math.ceil((daysInMonth + startDayIndex) / 7) * 7;
+    const grid = [];
+
+    // Empty slots tháng trước
+    for (let i = 0; i < startDayIndex; i++) {
+      grid.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    }
+
+    // Days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dayEvents = getEventsForDay(dateObj);
+      const isToday = new Date().toDateString() === dateObj.toDateString();
+
+      grid.push(
+        <div key={day} className={`calendar-day ${isToday ? 'is-today' : ''}`} onClick={() => handleDayClick(dateObj)}>
+          <div className="day-number">{day}</div>
+          <div className="day-events">
+            {dayEvents.slice(0, 3).map((ev, idx) => (
+              <div key={idx} className={`event-pill status-${ev.status === 'Đã hủy' ? 'failed' : 'active'}`} onClick={(e) => handleEventClick(e, ev)}>
+                {ev.subject}
+              </div>
+            ))}
+            {dayEvents.length > 3 && <div className="event-more">+{dayEvents.length - 3} nữa</div>}
+          </div>
+        </div>
+      );
+    }
+    // Empty slots cuối
+    const remaining = totalSlots - (startDayIndex + daysInMonth);
+    for (let i = 0; i < remaining; i++) {
+      grid.push(<div key={`empty-end-${i}`} className="calendar-day empty"></div>);
+    }
+    return <div className="calendar-body-grid month-view">{grid}</div>;
+  };
+
+  const renderWeekView = () => {
+    const startOfWeek = getStartOfWeek(currentDate);
+    const weekDays = [];
+    for(let i=0; i<7; i++) {
+      weekDays.push(addDays(startOfWeek, i));
+    }
+
+    return (
+      <div className="calendar-body-grid week-view">
+        {weekDays.map((dateObj, idx) => {
+           const dayEvents = getEventsForDay(dateObj);
+           const isToday = new Date().toDateString() === dateObj.toDateString();
+           const dateLabel = `${dateObj.getDate()}/${dateObj.getMonth()+1}`;
+           
+           return (
+             <div key={idx} className={`calendar-day week-col ${isToday ? 'is-today' : ''}`} onClick={() => handleDayClick(dateObj)}>
+               <div className="day-header-week">
+                 <span className="day-name">{['T2','T3','T4','T5','T6','T7','CN'][idx]}</span>
+                 <span className="day-num">{dateLabel}</span>
+               </div>
+               <div className="day-events-stack">
+                 {dayEvents.map((ev, eIdx) => (
+                    <div key={eIdx} className={`event-card status-${ev.status === 'Đã hủy' ? 'failed' : 'active'}`} onClick={(e) => handleEventClick(e, ev)}>
+                      <div className="ev-time">{ev.start} - {ev.end}</div>
+                      <div className="ev-title">{ev.className}</div>
+                      <div className="ev-sub">{ev.type}</div>
+                    </div>
+                 ))}
+               </div>
+             </div>
+           );
+        })}
+      </div>
     );
-    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Lich_Day_${activeTab}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  };
+
+  // --- RENDER MODAL CONTENT ---
+  const renderModalContent = () => {
+    if (!selectedDate) return null;
+    const dayEvents = getEventsForDay(selectedDate);
+
+    return (
+      <div className="modal-overlay" onClick={closeModal}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h3>Lịch dạy ngày {selectedDate.toLocaleDateString('vi-VN')}</h3>
+            <button className="btn-close" onClick={closeModal}><FiX /></button>
+          </div>
+          <div className="modal-body">
+            {dayEvents.length === 0 ? (
+              <div className="empty-state">
+                <p>Không có buổi dạy nào trong ngày này.</p>
+                <div style={{marginTop: '10px', color: '#6b7280', fontSize: '0.9rem'}}>
+                  Vui lòng qua trang "Quản lý Slots" để thêm lịch.
+                </div>
+              </div>
+            ) : (
+              <div className="event-list">
+                {dayEvents.map(ev => (
+                  <div key={ev.id} className="event-item-detail">
+                    <div className={`event-color-strip ${ev.status === 'Đã hủy' ? 'strip-red' : 'strip-blue'}`}></div>
+                    <div className="event-info">
+                      <h4>{ev.className}</h4>
+                      <div className="event-sub-title">Môn: {ev.subject}</div>
+                      <div className="event-meta">
+                        <span><FiClock /> {ev.start} - {ev.end}</span>
+                        <span><FiUsers /> {ev.registered}/{ev.max} HV</span>
+                      </div>
+                      <div className="event-meta">
+                        {ev.type === 'Online' ? (
+                          <span><FiMonitor /> Online • <a href={ev.link} target="_blank" rel="noreferrer">Link</a></span>
+                        ) : (
+                          <span><FiMapPin /> Offline • {ev.room}</span>
+                        )}
+                      </div>
+                      <div className={`status-badge ${ev.status === 'Đã hủy' ? 'st-failed' : 'st-success'}`}>
+                        {ev.status}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Helper text header
+  const getHeaderText = () => {
+    if (viewMode === 'month') {
+      return `Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
+    } else {
+      const start = getStartOfWeek(currentDate);
+      const end = addDays(start, 6);
+      return `Tuần ${start.getDate()}/${start.getMonth()+1} - ${end.getDate()}/${end.getMonth()+1}`;
+    }
   };
 
   return (
     <div className="dashboard-page-container">
+      {/* SIDEBAR */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-logo">
           <img src={dashboardPreview} alt="Logo" />
@@ -85,7 +265,7 @@ const TutorSchedulePage = () => {
         </div>
         <nav className="sidebar-nav">
           <NavLink to="/app/tutor/overview" className="nav-link"><FiHome /><span>Tổng quan</span></NavLink>
-          <NavLink to="/app/tutor/schedule" className="nav-link"><FiCalendar /><span>Lịch dạy</span></NavLink>
+          <NavLink to="/app/tutor/schedule" className="nav-link active"><FiCalendar /><span>Lịch dạy</span></NavLink>
           <NavLink to="/app/tutor/slots" className="nav-link"><FiPlusSquare /><span>Quản lý Slots</span></NavLink>
           <NavLink to="/app/tutor/settings" className="nav-link"><FiSettings /><span>Cài đặt</span></NavLink>
         </nav>
@@ -94,27 +274,17 @@ const TutorSchedulePage = () => {
       <div className="dashboard-main-content">
         <header className="dashboard-header">
           <h1 className="header-title">Lịch dạy của tôi</h1>
-          
-          {/* SEARCH BAR CONSISTENT UI */}
-          <div className="header-search-wrapper" style={{marginLeft: '2rem', position: 'relative', width: '300px'}}>
+          <div className="header-search-wrapper" style={{marginLeft: '2rem'}}>
             <div className="header-search">
               <FiSearch />
               <input 
                 type="text" 
-                placeholder="Tìm môn học..." 
+                placeholder="Tìm lịch..." 
                 value={searchTerm}
-                onChange={handleSearchChange}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {suggestions.length > 0 && (
-              <ul className="search-suggestions">
-                {suggestions.map((s, idx) => (
-                  <li key={idx} onClick={() => handleSelectSuggestion(s)}>{s}</li>
-                ))}
-              </ul>
-            )}
           </div>
-
           <div className="header-actions">
             <button className="btn-icon btn-plus"><FiPlus /></button>
             <button className="btn-icon"><FiBell /></button>
@@ -126,81 +296,35 @@ const TutorSchedulePage = () => {
         </header>
 
         <main className="dashboard-page-content">
-          <div className="stats-cards">
-            <div className="stat-card">
-              <p>Tổng số buổi ({activeTab === 'upcoming' ? 'Sắp tới' : 'Đã qua'})</p>
-              <h3>{filteredData.length}</h3>
+          <div className="calendar-controls">
+            <div className="cal-nav-group">
+              <button className="btn-cal-nav" onClick={handlePrev}><FiChevronLeft /></button>
+              <button className="btn-cal-nav" onClick={handleNext}><FiChevronRight /></button>
+              <h2 className="cal-title">{getHeaderText()}</h2>
             </div>
-            <div className="stat-card">
-              <p>Trạng thái</p>
-              <h3>{activeTab === 'upcoming' ? 'Đang chờ' : 'Đã xong'}</h3>
+            <div className="cal-actions">
+              <button className="btn-today" onClick={handleToday}>Hôm nay</button>
+              <div className="view-mode">
+                <button 
+                  className={viewMode === 'month' ? 'active' : ''} 
+                  onClick={() => setViewMode('month')}
+                >Tháng</button>
+                <button 
+                  className={viewMode === 'week' ? 'active' : ''} 
+                  onClick={() => setViewMode('week')}
+                >Tuần</button>
+              </div>
             </div>
           </div>
 
-          <div className="table-container">
-            <div className="tabs">
-              <button 
-                className={`tab ${activeTab === 'upcoming' ? 'active' : ''}`}
-                onClick={() => setActiveTab('upcoming')}
-              >
-                Lịch sắp tới
-              </button>
-              <button 
-                className={`tab ${activeTab === 'past' ? 'active' : ''}`}
-                onClick={() => setActiveTab('past')}
-              >
-                Lịch đã qua
-              </button>
-            </div>
-            <div className="table-filters">
-              <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                <span style={{fontSize: '0.9rem', color: '#6b7280'}}>Từ:</span>
-                <input type="date" className="filter-date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                <span style={{fontSize: '0.9rem', color: '#6b7280'}}>Đến:</span>
-                <input type="date" className="filter-date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-              </div>
-              
-              <button className="btn-export" onClick={handleExport}>
-                <FiDownload /> Export Lịch
-              </button>
-            </div>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>MÔN HỌC</th>
-                  {/* Changed Column Header */}
-                  <th>SỐ LƯỢNG</th> 
-                  <th>THỜI GIAN</th>
-                  <th>TRẠNG THÁI</th>
-                  <th>KẾT QUẢ</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.length > 0 ? filteredData.map((reg) => (
-                  <tr key={reg.id}>
-                    <td><strong>{reg.subject}</strong></td>
-                    {/* Changed Data Cell */}
-                    <td>{reg.quantity} học viên</td>
-                    <td>{reg.fullTime}</td>
-                    <td>
-                      <span className={`status ${
-                        reg.status === 'Đã xác nhận' || reg.status === 'Thành công' ? 'status-success' :
-                        reg.status === 'Chờ sinh viên' ? 'status-pending' :
-                        reg.status === 'Đã hủy' ? 'status-failed' : ''
-                      }`}>
-                        {reg.status}
-                      </span>
-                    </td>
-                    <td>{reg.result}</td>
-                  </tr>
-                )) : (
-                  <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem'}}>Không tìm thấy dữ liệu</td></tr>
-                )}
-              </tbody>
-            </table>
+          <div className="calendar-container">
+            {renderWeekHeader()}
+            {viewMode === 'month' ? renderMonthView() : renderWeekView()}
           </div>
         </main>
       </div>
+
+      {isModalOpen && renderModalContent()}
     </div>
   );
 };

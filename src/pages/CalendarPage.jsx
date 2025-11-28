@@ -6,7 +6,7 @@ import { FiChevronLeft, FiChevronRight, FiUsers } from 'react-icons/fi';
 import './CalendarPage.css';
 
 // Import Layout (Sidebar/Header) để giữ đồng bộ giao diện
-import './SchedulePage.css'; 
+import "./student/SchedulePage.css";
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell 

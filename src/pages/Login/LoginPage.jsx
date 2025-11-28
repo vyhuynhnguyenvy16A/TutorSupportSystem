@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
+import { useAuth } from '../../context/AuthContext';
+
 // Import icons
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
@@ -20,7 +22,13 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate();
+  // state loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigate = useNavigate(); // Dùng để chuyển trang sau khi login
+
+  // lấy login từ AuthContext
+  const { login } = useAuth();
 
   // --- LOGIC VALIDATION ---
   const validateForm = () => {
@@ -31,6 +39,8 @@ const LoginPage = () => {
     }
     if (!password) {
       newErrors.password = 'Password is required';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     setErrors(newErrors);
@@ -58,42 +68,34 @@ const LoginPage = () => {
   };
 
   // --- LOGIC SUBMIT FORM ---
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
 
     if (!validateForm()) {
       return;
     }
 
+    setIsSubmitting(true);
+    setErrors({});
+
+    const userData = await login(email, password);
+
+    if (!userData){
+      setErrors({api: "Đăng nhập thất bại"})
+    }
+
     console.log('Logging in:', { email, password });
 
-    // 1. KIỂM TRA TÀI KHOẢN MẶC ĐỊNH (Hardcoded cho Dev/Test)
-    const FAKE_TUTOR = { email: 'tutor@example.com', password: 'tutor123' };
-    const FAKE_STUDENT = { email: 'student@example.com', password: 'student123' };
+    const role = userData.role;
 
-    if (email === FAKE_TUTOR.email && password === FAKE_TUTOR.password) {
-      handleRoleRedirect('Tutor');
-      return;
+    if (role == "TUTOR"){
+      navigate('/app/tutor/overview')
+    } else if (role == "STUDENT"){
+      navigate('/app/overview')
     }
 
-    if (email === FAKE_STUDENT.email && password === FAKE_STUDENT.password) {
-      handleRoleRedirect('Student');
-      return;
-    }
 
-    // 2. KIỂM TRA TÀI KHOẢN TRONG LOCALSTORAGE (User đăng ký thật)
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const foundUser = storedUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (foundUser) {
-      // Tìm thấy user -> Điều hướng theo role đã lưu
-      handleRoleRedirect(foundUser.role);
-    } else {
-      // 3. ĐĂNG NHẬP THẤT BẠI
-      setErrors({ api: 'Email hoặc mật khẩu không đúng.' });
-    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -121,7 +123,8 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={errors.email ? 'input-error' : ''}
-                placeholder="name@example.com"
+                placeholder="sellostore@company.com"
+                disabled={isSubmitting}
               />
               {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
@@ -136,7 +139,8 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={errors.password ? 'input-error' : ''}
-                  placeholder="Enter password"
+                  placeholder="5ellostore."
+                  disabled={isSubmitting}
                 />
                 <span
                   className="password-toggle-icon"
@@ -161,8 +165,8 @@ const LoginPage = () => {
             </div>
 
             {/* --- Nút Log In --- */}
-            <button type="submit" className="btn-login">
-              Log In
+            <button type="submit" className="btn-login" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in..' : "Log In"}
             </button>
           </form>
 
