@@ -27,3 +27,16 @@ export const updateTutorProfile = async (updatedData) => {
 
     return response.data;
 }
+
+export const updateTutorLinhvuc = async (updatedData) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("No access token found");
+
+    const response = await axios.post(`${API_URL}/tutor/fields`, updatedData, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+
+    return response.data;
+}

@@ -7,12 +7,15 @@ import {
   FiSearch, FiPlus, FiBell, FiCamera, FiEdit2, FiSave, FiX
 } from 'react-icons/fi';
 import { set } from 'react-hook-form';
-import { getTutorProfile, updateTutorProfile } from '../../api/tutorService';
+import { getTutorProfile, updateTutorLinhvuc, updateTutorProfile } from '../../api/tutorService';
 import { meta } from '@eslint/js';
+import axios from 'axios';
+import { getFields } from '../../api/publicService';
 const TutorSettingsPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [fields, setFields] = useState([]);
   const fileInputRef = useRef(null);
 
   const formatDate = (isoString) => {
@@ -40,6 +43,18 @@ const TutorSettingsPage = () => {
     return age.toString();
   };
 
+  const formatGender = (gender) => {
+    switch (gender) {
+      case 'Nam':
+        return 'Nam';
+      case 'N_':
+        return 'Nữ';
+      case 'Kh_c':
+        return 'Khác';
+      default:
+        return '';
+    }
+  }
   // Mock State Profile
   const [profile, setProfile] = useState({
       photo: dashboardPreview,
@@ -59,6 +74,8 @@ const TutorSettingsPage = () => {
       address: '',
       bomon: '',
       bangcap: '',
+      linhvuc: '',
+      linhvucid: []
     });
   const [tempProfile, setTempProfile] = useState(profile);
   // Fetch Data:
@@ -66,7 +83,10 @@ const TutorSettingsPage = () => {
     const fetchProfile = async () => {
       try {
         setIsLoading(true);
-        const response = await getTutorProfile();
+        const [response, fieldRes] = await Promise.all([
+          getTutorProfile(),
+          getFields()
+        ]);
 
         if(response && response.meta && response.meta.tutorInfo) {
           const data = response.meta.tutorInfo;
@@ -82,9 +102,19 @@ const TutorSettingsPage = () => {
             lichranh: data.LICHRANH || '',
             bangcap: data.BANGCAP || '',
             bomon: data.BOMON || '',
-            gender: data.GIOITINH || '',
-            cccd: data.CMND || ''
+            gender: formatGender(data.GIOITINH) || '',
+            cccd: data.CMND || '',
+            linhvuc: data.LINHVUC || []
           }))
+        }
+
+        // Xử lý Lĩnh vực
+        if (fieldRes && fieldRes.meta && fieldRes.meta.fieldList) {
+          const mappedFields = fieldRes.meta.fieldList.map(item => ({
+            id: item.LINHVUCID, // <--- LƯU Ý: Backend nên trả về ID thật
+            name: item.TENLINHVUC
+          }));
+          setFields(mappedFields);
         }
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -100,10 +130,18 @@ const TutorSettingsPage = () => {
     const { name, value } = e.target;
     setTempProfile(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  const handleLinhVucChange = (e) => {
+    const {name, value}  = e.target;
+    setTempProfile(prev => ({
+      ...prev,
+      [name]: value,
+      linhvucid: fields.filter(f => f.name === value).map(f => f.id)
+    }));
+  }
   // Handle Avatar Change
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -132,7 +170,7 @@ const TutorSettingsPage = () => {
         throw "err";
       }
 
-      const payload = {
+      const payload_profile = {
         hoTen: tempProfile.name,
         ngaySinh: formatInputDate(tempProfile.rawDob),
         gioiTinh: tempProfile.gender,
@@ -143,8 +181,13 @@ const TutorSettingsPage = () => {
         TRANGTHAI: tempProfile.trangthai,
         LICHRANH_TEXT: tempProfile.lichranh
       }
-      
-      await updateTutorProfile(payload);
+      const payload_linhvuc = {
+        fieldIds: [ tempProfile.linhvucid ]
+      }
+      await Promise.all([
+        updateTutorProfile(payload_profile),
+        updateTutorLinhvuc(payload_linhvuc)
+      ]);
 
       setProfile(tempProfile);
 
@@ -235,8 +278,25 @@ const TutorSettingsPage = () => {
                   {isEditing ? <input className="tutor-input" type="date" name="rawDob" value={tempProfile.rawDob} onChange={handleChange}/> : <div className="field-value">{formatDate(profile.rawDob)}</div>}
                 </div>
                 <div className="form-field-row">
-                  <label>Giới tính</label>
-                  {isEditing ? <input className="tutor-input" name="gender" value={tempProfile.gender} onChange={handleChange}/> : <div className="field-value">{profile.gender}</div>}
+                  <label>Giới tính:</label>
+                  {isEditing ? (
+                    <select
+                      className="tutor-input"
+                      name="gender"
+                      value={tempProfile.gender} // Dùng biến tạm (tempProfile)
+                      onChange={handleChange}
+                    >
+                      {/* Tùy chọn mặc định nếu dữ liệu trống (tùy bạn có muốn giữ hay không) */}
+                      
+                      <option value="Nam">Nam</option>
+                      <option value="N_">Nữ</option>
+                      <option value="Kh_c">Khác</option>
+                    </select>
+                  ) : (
+                    <div className="field-value">
+                      {formatGender(profile.gender)}
+                    </div>
+                  )}
                 </div>
                 <div className="form-field-row">
                   <label>CMND:</label>
@@ -253,13 +313,27 @@ const TutorSettingsPage = () => {
                   <label>Email:</label>
                   <div className="field-value" style={{backgroundColor: '#f3f4f6', color:'#9ca3af'}}>{profile.email}</div>
                 </div>
-                {/* <div className="form-field-row-full">
-                  <label>Địa chỉ:</label>
-                  {isEditing ? <textarea className="tutor-input" rows="2" name="address" value={profile.address} onChange={handleChange}/> : <div className="field-value">{profile.address}</div>}
-                </div> */}
                 <div className="form-field-row-full">
                   <label>Lĩnh vực</label>
-                  {isEditing ? <textarea className="tutor-input" rows="2" name="linhvuc" value={tempProfile.linhvuc} onChange={handleChange}/> : <div className="field-value">{profile.linhvuc}</div>}
+                  {isEditing ? (
+                    <select
+                      className="tutor-input"
+                      name="linhvuc"
+                      value={tempProfile.linhvuc}
+                      onChange={handleLinhVucChange}
+                    >
+                      <option value="">-- Chọn lĩnh vực --</option>
+                      {fields.map(f => (
+                        <option key={f.id} value={f.name}>
+                          {f.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="field-value">
+                      {profile.linhvuc || "Chưa cập nhật"}
+                    </div>
+                  )}
                 </div>
                 <div className="form-field-row-full">
                   <label>Bộ môn</label>
