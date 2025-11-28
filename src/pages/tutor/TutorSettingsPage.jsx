@@ -11,6 +11,8 @@ import { getTutorProfile, updateTutorLinhvuc, updateTutorProfile } from '../../a
 import { meta } from '@eslint/js';
 import axios from 'axios';
 import { getFields } from '../../api/publicService';
+import Select from 'react-select';
+
 const TutorSettingsPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -124,6 +126,42 @@ const TutorSettingsPage = () => {
     };
     fetchProfile();
   }, []);
+
+  // hàm cho lĩnh vực.
+  const fieldOptions = fields.map(item => ({
+    value: item.id,   // ID của lĩnh vực (ví dụ: 4)
+    label: item.name  // Tên lĩnh vực (ví dụ: An toàn thông tin)
+  }));
+
+  // 2. Hàm xử lý riêng cho Select Multi
+  const handleMultiSelectChange = (selectedOptions) => {
+    // selectedOptions sẽ trả về một mảng các object: [{value: 1, label: 'A'}, {value: 2, label: 'B'}]
+    // Chúng ta chỉ cần lấy mảng ID để gửi lên backend: [1, 2]
+    const selectedIds = selectedOptions ? selectedOptions.map(item => item.value) : [];
+    
+    setTempProfile(prev => ({
+      ...prev,
+      linhvuc: selectedIds // Lưu mảng ID vào state (VD: [1, 3, 5])
+    }));
+  };
+
+  // 3. Hàm helper để tìm các option đang được chọn dựa trên mảng ID đang lưu trong state
+  // (Dùng để hiển thị giá trị hiện tại lên ô Select)
+  const getValueForSelect = () => {
+    if (!tempProfile.linhvuc) return [];
+    // Lọc ra những option nào có ID nằm trong mảng tempProfile.linhvuc
+    return fieldOptions.filter(option => tempProfile.linhvuc.includes(option.value));
+  };
+
+  // 4. Hàm helper để hiển thị tên các lĩnh vực khi KHÔNG ở chế độ edit
+  const getDisplayFields = () => {
+    if (!profile.linhvuc || !Array.isArray(profile.linhvuc)) return "Chưa cập nhật";
+    // Map từ ID sang Tên để hiển thị
+    const names = fields
+      .filter(field => profile.linhvuc.includes(field.id))
+      .map(field => field.name);
+    return names.join(', '); // Kết quả: "CNTT, Marketing, Y tế"
+  };
   // Handle Input Change
   const handleChange = (e) => {
     // Lưu tạm vào một tempProfile cho trang web.
@@ -182,7 +220,7 @@ const TutorSettingsPage = () => {
         LICHRANH_TEXT: tempProfile.lichranh
       }
       const payload_linhvuc = {
-        fieldIds: [ tempProfile.linhvucid ]
+        fieldIds: [ tempProfile.linhvuc ]
       }
       await Promise.all([
         updateTutorProfile(payload_profile),
@@ -313,7 +351,7 @@ const TutorSettingsPage = () => {
                   <label>Email:</label>
                   <div className="field-value" style={{backgroundColor: '#f3f4f6', color:'#9ca3af'}}>{profile.email}</div>
                 </div>
-                <div className="form-field-row-full">
+                {/* <div className="form-field-row-full">
                   <label>Lĩnh vực</label>
                   {isEditing ? (
                     <select
@@ -332,6 +370,32 @@ const TutorSettingsPage = () => {
                   ) : (
                     <div className="field-value">
                       {profile.linhvuc || "Chưa cập nhật"}
+                    </div>
+                  )}
+                </div> */}
+                <div className="form-field-row-full">
+                  <label>Lĩnh vực chuyên môn</label>
+                  {isEditing ? (
+                    <div className="tutor-input-wrapper">
+                      <Select
+                        isMulti // Bật chế độ chọn nhiều
+                        name="linhvuc"
+                        options={fieldOptions} // Danh sách lựa chọn
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder="Chọn các lĩnh vực..."
+                        
+                        // Giá trị hiện tại (phải convert từ mảng ID sang mảng object {value, label})
+                        value={getValueForSelect()} 
+                        
+                        // Hàm xử lý khi chọn
+                        onChange={handleMultiSelectChange}
+                      />
+                    </div>
+                  ) : (
+                    <div className="field-value">
+                      {/* Hiển thị danh sách tên lĩnh vực ngăn cách bằng dấu phẩy */}
+                      {getDisplayFields()}
                     </div>
                   )}
                 </div>
