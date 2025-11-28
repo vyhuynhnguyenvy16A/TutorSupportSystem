@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './TutorSlotsPage.css'; 
-import './TutorOverviewPage.css'; // Kế thừa styles Modal và Notification
-
+import './TutorOverviewPage.css'; 
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell, 
@@ -11,7 +10,46 @@ import {
 } from 'react-icons/fi';
 import dashboardPreview from '../../assets/hcmut.png';
 
-// --- HELPER: NOTIFICATION SYSTEM (Shared Logic via LocalStorage) ---
+// --- DATA UTILS (LocalStorage) ---
+const LOCAL_STORAGE_KEY = 'tutor_db_slots';
+
+const loadSlotsFromStorage = () => {
+  const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return data ? JSON.parse(data) : null;
+};
+
+const saveSlotsToStorage = (slots) => {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(slots));
+};
+
+// --- MOCK DATA DEFAULT ---
+const availableClasses = [
+  { id: 'C01', name: 'Lớp UI/UX Design K15', subject: 'UI/UX Design' },
+  { id: 'C02', name: 'Graphic Design Masterclass', subject: 'Graphic Design' },
+  { id: 'C03', name: 'Lớp Toán 12A1', subject: 'Toán Học' }, 
+  { id: 'C04', name: 'Lớp Lập Trình Web', subject: 'Web Development' },
+];
+
+const initialSlots = [
+  { 
+    id: 1, 
+    className: 'Lớp UI/UX Design K15', 
+    subject: 'UI/UX Design', 
+    date: '2025-11-25', 
+    start: '09:00', end: '11:00', type: 'Offline', room: 'Phòng A204, Tòa H6', link: '', 
+    status: 'Còn trống', registered: 5, max: 20 
+  },
+  { 
+    id: 2, 
+    className: 'Graphic Design Masterclass',
+    subject: 'Graphic Design',
+    date: '2025-11-28', 
+    start: '13:30', end: '15:30', type: 'Online', room: '', link: 'https://meet.google.com/abc-xyz', 
+    status: 'Còn trống', registered: 10, max: 15 
+  },
+];
+
+// --- NOTIFICATION UTILS ---
 const getNotifications = () => {
   const data = localStorage.getItem('tutor_notifications');
   return data ? JSON.parse(data) : [];
@@ -42,49 +80,36 @@ const formatDateVN = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
-// --- MOCK DATA CẬP NHẬT ---
-// Dữ liệu lớp học có sẵn từ Overview (Giả lập)
-const availableClasses = [
-  { id: 'C01', name: 'Lớp UI/UX Design K15', subject: 'UI/UX Design' },
-  { id: 'C02', name: 'Graphic Design Masterclass', subject: 'Graphic Design' },
-  { id: 'C03', name: 'Lớp Toán 12A1', subject: 'Toán Học' }, 
-  { id: 'C04', name: 'Lớp Lập Trình Web', subject: 'Web Development' },
-];
-
-const initialSlots = [
-  { 
-    id: 1, 
-    className: 'Lớp UI/UX Design K15', // Tên lớp
-    subject: 'UI/UX Design', // Môn học
-    date: '2025-11-25', 
-    start: '09:00', end: '11:00', type: 'Offline', room: 'Phòng A204, Tòa H6', link: '', 
-    status: 'Còn trống', registered: 5, max: 20 
-  },
-  { 
-    id: 2, 
-    className: 'Graphic Design Masterclass',
-    subject: 'Graphic Design',
-    date: '2025-11-28', 
-    start: '13:30', end: '15:30', type: 'Online', room: '', link: 'https://meet.google.com/abc-xyz', 
-    status: 'Còn trống', registered: 10, max: 15 
-  },
-];
-
 const TutorSlotsPage = () => {
-  const [slots, setSlots] = useState(initialSlots);
+  const [slots, setSlots] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  
-  // State Notification
   const [notifications, setNotifications] = useState([]);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState(null);
 
-  // Load notifications
+  // --- 1. INITIAL LOAD (Persistence) ---
   useEffect(() => {
+    // Load notifications
     setNotifications(getNotifications());
+
+    // Load Slots from LocalStorage
+    const saved = loadSlotsFromStorage();
+    if (saved) {
+      setSlots(saved);
+    } else {
+      // First time init
+      setSlots(initialSlots);
+      saveSlotsToStorage(initialSlots);
+    }
   }, []);
 
+  // --- 2. SAVE CHANGES EFFECT ---
+  // Mỗi khi state 'slots' thay đổi (thêm/sửa/xóa), update LocalStorage
+  // Lưu ý: Chỉ save khi slots có data để tránh overwrite lúc mount
+  // Tuy nhiên ở useEffect trên ta đã setSlots.
+  // Cách an toàn hơn là update localStorage ngay trong hàm handleSave/Delete
+  
   // Handlers Notification
   const toggleNotifDropdown = () => setShowNotifDropdown(!showNotifDropdown);
   const handleNotifClick = (notif) => {
@@ -96,28 +121,16 @@ const TutorSlotsPage = () => {
   
   // State form
   const [formData, setFormData] = useState({
-    id: null,
-    className: '',
-    subject: '',
-    date: '',
-    start: '',
-    end: '',
-    type: 'Online',
-    link: '',
-    room: '',
-    max: 20,
-    note: ''
+    id: null, className: '', subject: '', date: '', start: '', end: '', type: 'Online', link: '', room: '', max: 20, note: ''
   });
 
   const handleOpenCreate = () => {
     setIsEditMode(false);
-    // Mặc định chọn lớp đầu tiên
     const defaultClass = availableClasses[0];
+    const today = new Date().toISOString().split('T')[0];
     setFormData({ 
-      id: null, 
-      className: defaultClass.name, 
-      subject: defaultClass.subject, 
-      date: '', start: '', end: '', type: 'Online', link: '', room: '', max: 20, note: '' 
+      id: null, className: defaultClass.name, subject: defaultClass.subject, 
+      date: today, start: '08:00', end: '10:00', type: 'Online', link: '', room: '', max: 20, note: '' 
     });
     setIsModalOpen(true);
   };
@@ -128,14 +141,13 @@ const TutorSlotsPage = () => {
     setIsModalOpen(true);
   };
 
-  // --- LOGIC CHỌN LỚP -> TỰ ĐỘNG CẬP NHẬT MÔN ---
   const handleClassChange = (e) => {
     const selectedName = e.target.value;
     const foundClass = availableClasses.find(c => c.name === selectedName);
     setFormData({
       ...formData,
       className: selectedName,
-      subject: foundClass ? foundClass.subject : '' // Auto-fill Subject
+      subject: foundClass ? foundClass.subject : '' 
     });
   };
 
@@ -146,27 +158,36 @@ const TutorSlotsPage = () => {
       room: formData.type === 'Offline' ? formData.room : ''
     };
 
+    let newSlotsList = [];
+
     if (isEditMode) {
-      setSlots(slots.map(s => s.id === formData.id ? { ...cleanData, registered: s.registered, status: s.status } : s));
-      const updated = addNotification('Cập nhật Slot', `Đã cập nhật slot cho lớp ${cleanData.className}`);
-      setNotifications(updated);
+      newSlotsList = slots.map(s => s.id === formData.id ? { ...cleanData, registered: s.registered, status: s.status } : s);
+      const updatedNotif = addNotification('Cập nhật Slot', `Đã cập nhật slot cho lớp ${cleanData.className}`);
+      setNotifications(updatedNotif);
     } else {
       const newSlot = {
         ...cleanData,
-        id: Date.now(),
+        id: Date.now(), // Unique ID
         status: 'Còn trống',
         registered: 0
       };
-      setSlots([...slots, newSlot]);
-      const updated = addNotification('Thêm Slot thành công', `Đã thêm lịch dạy mới cho môn ${cleanData.subject} (${cleanData.className})`);
-      setNotifications(updated);
+      newSlotsList = [...slots, newSlot];
+      const updatedNotif = addNotification('Thêm Slot thành công', `Đã thêm lịch dạy mới cho môn ${cleanData.subject} (${cleanData.className})`);
+      setNotifications(updatedNotif);
     }
+    
+    // UPDATE STATE & STORAGE
+    setSlots(newSlotsList);
+    saveSlotsToStorage(newSlotsList);
+    
     setIsModalOpen(false);
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa slot này?")) {
-      setSlots(slots.filter(s => s.id !== id));
+      const newSlotsList = slots.filter(s => s.id !== id);
+      setSlots(newSlotsList);
+      saveSlotsToStorage(newSlotsList);
     }
   };
 
@@ -182,7 +203,7 @@ const TutorSlotsPage = () => {
         <nav className="sidebar-nav">
           <NavLink to="/app/tutor/overview" className="nav-link"><FiHome /><span>Tổng quan</span></NavLink>
           <NavLink to="/app/tutor/schedule" className="nav-link"><FiCalendar /><span>Lịch dạy</span></NavLink>
-          <NavLink to="/app/tutor/slots" className="nav-link"><FiPlusSquare /><span>Quản lý Slots</span></NavLink>
+          <NavLink to="/app/tutor/slots" className="nav-link active"><FiPlusSquare /><span>Quản lý Slots</span></NavLink>
           <NavLink to="/app/tutor/settings" className="nav-link"><FiSettings /><span>Cài đặt</span></NavLink>
         </nav>
       </aside>
@@ -196,7 +217,6 @@ const TutorSlotsPage = () => {
           <div className="header-actions">
             <button className="btn-icon btn-plus" onClick={handleOpenCreate}><FiPlus /></button>
             
-            {/* --- NOTIFICATION ICON --- */}
             <div className="notification-wrapper">
               <button className="btn-icon" onClick={toggleNotifDropdown}>
                 <FiBell />
@@ -247,7 +267,6 @@ const TutorSlotsPage = () => {
                 {slots.map((slot) => (
                   <tr key={slot.id}>
                     <td>
-                      {/* HIỂN THỊ RÕ LỚP VÀ MÔN */}
                       <div style={{fontWeight: 600, color: '#111827'}}>{slot.className}</div>
                       <small style={{color: '#6b7280', fontSize: '0.85rem'}}>Môn: {slot.subject}</small>
                     </td>
@@ -297,7 +316,6 @@ const TutorSlotsPage = () => {
               </div>
               <div className="tutor-modal-body">
                 
-                {/* --- CHỌN LỚP -> TỰ ĐỘNG GỢI Ý MÔN --- */}
                 <div className="tutor-form-group">
                   <label>Chọn Lớp</label>
                   <select value={formData.className} onChange={handleClassChange}>
@@ -310,7 +328,6 @@ const TutorSlotsPage = () => {
                 <div className="tutor-form-group">
                   <label>Môn học (Tự động theo lớp)</label>
                   <select value={formData.subject} disabled style={{backgroundColor: '#f3f4f6'}}>
-                    {/* Hiển thị tất cả môn để select có value đúng, nhưng bị disable */}
                     {availableClasses.map((cls) => (
                       <option key={cls.id} value={cls.subject}>{cls.subject}</option>
                     ))}
@@ -372,7 +389,7 @@ const TutorSlotsPage = () => {
           </div>
         )}
 
-        {/* --- MODAL CHI TIẾT THÔNG BÁO --- */}
+        {/* NOTIFICATION MODAL (Giữ nguyên) */}
         {selectedNotif && (
           <div className="tutor-modal-overlay">
              <div className="confirm-modal-box" style={{width: '500px'}}>
