@@ -46,11 +46,11 @@ const OverviewPage = () => {
           setBatches(batchRes.meta);
         }
 
-        // Xử lý Lĩnh vực: Vì API trả về mảng string, ta tạm map index+1 thành ID
-        if (fieldRes && fieldRes.meta && fieldRes.meta.resultList) {
-          const mappedFields = fieldRes.meta.resultList.map((name, index) => ({
-            id: index + 1, // <--- LƯU Ý: Backend nên trả về ID thật
-            name: name
+        if (fieldRes && fieldRes.meta && fieldRes.meta.fieldList) {
+          console.log(fieldRes.meta.fieldList)
+          const mappedFields = fieldRes.meta.fieldList.map((item) => ({
+            id: item.LINHVUCID, 
+            name: item.TENLINHVUC
           }));
           setFields(mappedFields);
         }
