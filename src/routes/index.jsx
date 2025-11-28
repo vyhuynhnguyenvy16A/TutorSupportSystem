@@ -17,6 +17,7 @@ import TutorOverviewPage from '../pages/tutor/TutorOverviewPage.jsx';
 import TutorSchedulePage from '../pages/tutor/TutorSchedulePage.jsx';
 import TutorSlotsPage from '../pages/tutor/TutorSlotsPage.jsx';
 import TutorSettingsPage from '../pages/tutor/TutorSettingsPage.jsx';
+import CalendarPage from '../pages/CalendarPage.jsx';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -36,11 +37,11 @@ const AppRoutes = () => {
 
       {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
       <Route path="/app/overview" element={<OverviewPage />} />
-      <Route path="/app/register-schedule" element={<div>Trang Đăng Kí Lịch</div>} />
+      
       <Route path="/app/settings" element={<SettingsPage />} />
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
-      
+      <Route path="/app/register-schedule" element={<CalendarPage />} />
       <Route path="/admin" element={<Dashboard />} />
 
       {/* <-- 2. THÊM 4 ROUTES MỚI CHO TUTOR (GIẢNG VIÊN) VÀO ĐÂY --> */}

@@ -1,0 +1,123 @@
+/* src/pages/CalendarPage/CalendarPage.css */
+
+.calendar-container-wrapper {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  
+  /* <-- SỬA ĐỔI QUAN TRỌNG: Full màn hình */
+  width: 100%; 
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header: Tháng + Nút điều hướng */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.calendar-nav-buttons button {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+.calendar-nav-buttons button:hover {
+  color: #111827;
+}
+
+/* GRID SYSTEM */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 cột đều nhau */
+  row-gap: 1rem;
+  text-align: center;
+}
+
+.calendar-day-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-day {
+  height: 40px;
+  width: 40px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* Hình tròn */
+  cursor: pointer;
+  position: relative; /* Để định vị chấm tròn */
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.calendar-day:hover:not(.is-today) {
+  background-color: #f3f4f6;
+}
+
+/* Style cho ngày hôm nay (Màu xanh đậm) */
+.calendar-day.is-today {
+  background-color: #1d4ed8; /* Màu xanh đậm giống ảnh */
+  color: white;
+  font-weight: 600;
+}
+
+/* CHẤM TRÒN BÁO LỊCH HỌP */
+.meeting-dot {
+  width: 5px;
+  height: 5px;
+  background-color: #ef4444; /* Màu đỏ (hoặc xanh tùy bạn) */
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px; /* Nằm dưới số ngày */
+}
+
+/* Nếu ngày hôm nay có lịch, chấm màu trắng cho nổi */
+.is-today .meeting-dot {
+  background-color: #ffffff;
+}
+
+/* Footer: Tìm người */
+.calendar-footer {
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.btn-find-people {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-find-people:hover {
+  background-color: #e5e7eb;
+}
