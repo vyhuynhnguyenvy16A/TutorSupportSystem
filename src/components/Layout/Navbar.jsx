@@ -24,11 +24,11 @@ const Navbar = () => {
       <div className="navbar-right">
         {/* <-- SỬA ĐỔI: Thay <button> bằng <Link> và thêm prop 'to' */}
         <Link to="/register" className="btn btn-secondary">
-          Sign up
+          Đăng ký
         </Link>
         {/* <-- SỬA ĐỔI: Thay <button> bằng <Link> và thêm prop 'to' */}
         <Link to="/login" className="btn btn-primary">
-          Log in
+          Đăng nhập
         </Link>
       </div>
     </header>

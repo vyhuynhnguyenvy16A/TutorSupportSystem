@@ -1,4 +1,9 @@
 .homepage{
     width: 100%;
-    height: auto;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.homepage::-webkit-scrollbar{
+    display: none;
 }
