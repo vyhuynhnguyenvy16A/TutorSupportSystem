@@ -61,9 +61,9 @@ const OverviewPage = () => {
             <span>Tổng quan</span>
           </NavLink>
          
-          <NavLink to="/app/register-schedule" className="nav-link">
+          <NavLink to="/app/schedule" className="nav-link">
             <FiPlusSquare />
-            <span>Đăng kí lịch</span>
+            <span>lịch</span>
           </NavLink>
           <NavLink to="/app/settings" className="nav-link">
             <FiSettings />

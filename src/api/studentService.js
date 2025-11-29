@@ -47,3 +47,20 @@ export const submitRegistration = async (data) => {
   });
   return response.data;
 };
+
+export const getCalendar = async (month, year) => {
+  const token = localStorage.getItem('token')
+  if (!token) throw new Error("No access token found")
+
+    const response = await axios.get(`${API_URL}/student/calendar`, {
+      headers:{
+        'Authorization': `Bearer ${token}`
+      },
+      params: {
+      month: month,
+      year: year
+    }
+    })
+
+    return response.data
+}

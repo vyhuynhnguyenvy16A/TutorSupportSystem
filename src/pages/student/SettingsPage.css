@@ -97,4 +97,17 @@
   min-height: 42px; /* Đảm bảo chiều cao tối thiểu */
 }
 
+
+.btn-edit, .btn-save, .btn-cancel{
+  background: transparent;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+}
+
 /* 2.2 CỘT BÊN PHẢI */

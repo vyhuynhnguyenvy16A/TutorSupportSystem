@@ -44,15 +44,15 @@ const SchedulePage = () => {
     <FiHome /> <span>Tổng quan</span>
   </NavLink>
   
-  <NavLink to="/app/calendar" className="nav-link">
+  <NavLink to="/app/schedule" className="nav-link">
     <FiCalendar /> <span>Lịch</span>
   </NavLink>
 
   {/* --- ĐẢM BẢO DÒNG NÀY ĐÚNG --- */}
   {/* Khi bấm vào đây, nó sẽ dẫn đến /app/register-schedule */}
   {/* Và ở Bước 1 ta đã cấu hình route này hiển thị CalendarPage */}
-  <NavLink to="/app/register-schedule" className="nav-link">
-    <FiPlusSquare /> <span>Đăng kí lịch</span>
+  <NavLink to="/app/schedule" className="nav-link">
+    <FiPlusSquare /> <span>lịch</span>
   </NavLink>
 
   <NavLink to="/app/settings" className="nav-link">

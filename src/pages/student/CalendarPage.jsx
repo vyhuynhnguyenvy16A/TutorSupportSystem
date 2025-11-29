@@ -5,30 +5,40 @@ import { NavLink } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight, FiUsers } from 'react-icons/fi';
 import './CalendarPage.css';
 
-// Import Layout (Sidebar/Header) để giữ đồng bộ giao diện
-import "./student/SchedulePage.css";
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
   FiSearch, FiPlus, FiBell 
 } from 'react-icons/fi';
-import hcmutLogo from '../assets/hcmut.png'; 
+import hcmutLogo from '../../assets/hcmut.png'; 
+import { getCalendar } from '../../api/studentService';
 
 const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [meetings, setMeetings] = useState([]); // Chứa danh sách lịch họp từ API
   const [loading, setLoading] = useState(true);
 
+    // --- 2. LOGIC LỊCH ---
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) -> 6 (Sat)
+    return { daysInMonth, firstDay, year, month };
+  };
+
+  const { daysInMonth, firstDay, year, month } = getDaysInMonth(currentDate);
+
   // --- 1. GỌI API ---
   useEffect(() => {
     const fetchCalendarData = async () => {
       try {
-        const response = await fetch('http://localhost:3069/api/student/calendar');
-        if (!response.ok) {
-          throw new Error('Lỗi kết nối server');
-        }
-        const data = await response.json();
-        // Giả sử API trả về mảng các object: [{ date: '2025-11-27', title: 'Họp nhóm' }, ...]
-        setMeetings(data); 
+        console.log("Month: ", month + 1)
+        console.log("Year: ", year)
+        const response = await getCalendar(month + 1, year);
+
+        console.log(response)
+        console.log(response.meta)
+        setMeetings(response.meta)
       } catch (error) {
         console.error("Không thể lấy dữ liệu lịch:", error);
         // Dữ liệu mẫu để test nếu API chưa chạy
@@ -42,18 +52,9 @@ const CalendarPage = () => {
     };
 
     fetchCalendarData();
-  }, []);
+  }, [month, year]);
 
-  // --- 2. LOGIC LỊCH ---
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) -> 6 (Sat)
-    return { daysInMonth, firstDay, year, month };
-  };
 
-  const { daysInMonth, firstDay, year, month } = getDaysInMonth(currentDate);
 
   const prevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -65,16 +66,11 @@ const CalendarPage = () => {
 
   const daysOfWeek = ['Cn', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
-  // Hàm kiểm tra xem ngày nào có lịch họp
   const hasMeeting = (day) => {
-    // Format ngày hiện tại thành chuỗi YYYY-MM-DD để so sánh
-    // Lưu ý: Tháng trong JS bắt đầu từ 0 nên cần +1
     const checkDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    
-    // Tìm trong mảng meetings xem có ngày nào trùng không
+    console.log(checkDate)
     return meetings.some(meeting => {
-        // Cắt chuỗi ngày từ API để so sánh (giả sử API trả về ISO string hoặc YYYY-MM-DD)
-        return meeting.date.startsWith(checkDate);
+        return meeting.THOIGIANBATDAU.startsWith(checkDate);
     });
   };
 
@@ -98,8 +94,8 @@ const CalendarPage = () => {
           </NavLink>
           {/* Link này đang active */}
           
-          <NavLink to="/app/register-schedule" className="nav-link">
-            <FiPlusSquare /> <span>Đăng kí lịch</span>
+          <NavLink to="/app/schedule" className="nav-link">
+            <FiCalendar /> <span>Lịch</span>
           </NavLink>
           <NavLink to="/app/settings" className="nav-link">
             <FiSettings /> <span>Cài đặt</span>

@@ -145,7 +145,6 @@ const SettingsPage = () => {
         <nav className="sidebar-nav">
           <NavLink to="/app/overview" className="nav-link"><FiHome /><span>Tổng quan</span></NavLink>
           <NavLink to="/app/schedule" className="nav-link"><FiCalendar /><span>Lịch</span></NavLink>
-          <NavLink to="/app/register-schedule" className="nav-link"><FiPlusSquare /><span>Đăng kí lịch</span></NavLink>
           <NavLink to="/app/settings" className="nav-link"><FiSettings /><span>Cài đặt</span></NavLink>
         </nav>
       </aside>

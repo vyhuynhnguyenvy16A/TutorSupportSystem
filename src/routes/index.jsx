@@ -16,7 +16,7 @@ import TutorOverviewPage from '../pages/tutor/TutorOverviewPage.jsx';
 import TutorSchedulePage from '../pages/tutor/TutorSchedulePage.jsx';
 import TutorSlotsPage from '../pages/tutor/TutorSlotsPage.jsx';
 import TutorSettingsPage from '../pages/tutor/TutorSettingsPage.jsx';
-import CalendarPage from '../pages/CalendarPage.jsx';
+import CalendarPage from '../pages/student/CalendarPage.jsx';
 import ProtectedRoute from './protectedRoute.jsx';
 const AppRoutes = () => {
   return (
@@ -32,18 +32,15 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      {/* (Lưu ý: chúng ta dùng /app/schedule để khớp với NavLink) */}
-      <Route path="/app/schedule" element={<SchedulePage />} />
 
       {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
       <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
         <Route path="/app/overview" element={<OverviewPage />} />
-        <Route path="/app/schedule" element={<SchedulePage />} />
+        <Route path="/app/schedule" element={<CalendarPage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
       </Route>
       {/* (Thêm các route cho trang khác ở đây) */}
       {/* <Route path="/register" element={<RegisterPage />} /> */}
-      <Route path="/app/register-schedule" element={<CalendarPage />} />
       <Route path="/admin" element={<Dashboard />} />
 
       {/* <-- 2. THÊM 4 ROUTES MỚI CHO TUTOR (GIẢNG VIÊN) VÀO ĐÂY --> */}
