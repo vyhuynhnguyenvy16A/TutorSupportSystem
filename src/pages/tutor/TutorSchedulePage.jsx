@@ -1,45 +1,80 @@
-// TutorSchedulePage.jsx
+// src/pages/tutor/TutorSchedulePage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './TutorSchedulePage.css'; 
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,
-  FiSearch, FiPlus, FiBell, FiChevronLeft, FiChevronRight, FiX, FiClock, FiMapPin, FiUsers, FiMonitor
+  FiSearch, FiBell, FiChevronLeft, FiChevronRight, FiX, 
+  FiClock, FiMapPin, FiPlus, FiVideo
 } from 'react-icons/fi';
 import dashboardPreview from '../../assets/hcmut.png';
+
+// Import API
+import { getTutorBookings } from '../../api/tutorService.js';
 
 const TutorSchedulePage = () => {
   const [currentDate, setCurrentDate] = useState(new Date()); 
   const [events, setEvents] = useState([]);
-  const [viewMode, setViewMode] = useState('month'); // 'month' | 'week'
+  const [viewMode, setViewMode] = useState('month');
   const [selectedDate, setSelectedDate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  // --- 1. DATA LOADING (FROM LOCALSTORAGE) ---
   useEffect(() => {
-    // Lấy dữ liệu được tạo từ trang SlotsPage
-    const savedSlots = localStorage.getItem('tutor_db_slots');
-    if (savedSlots) {
-      setEvents(JSON.parse(savedSlots));
-    } else {
-      // Nếu chưa có, dùng mảng rỗng hoặc sample (tùy chọn)
-      setEvents([]);
-    }
+    const fetchSchedule = async () => {
+      try {
+        setLoading(true);
+        const response = await getTutorBookings();
+        
+        // Kiểm tra data trả về
+        const bookingsData = response.meta?.bookings || []; 
+
+        const mappedEvents = bookingsData.map((booking, index) => {
+           const startDate = new Date(booking.THOIGIANBATDAU);
+           const endDate = new Date(booking.THOIGIANKETTHUC);
+           
+           const dateKey = startDate.toISOString().split('T')[0];
+           
+           const startTime = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+           const endTime = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+           return {
+             id: booking.ID || index,
+             date: dateKey, // YYYY-MM-DD
+             fullDate: startDate,
+             start: startTime,
+             end: endTime,
+             subject: booking.TIEUDE,
+             type: booking.LOAIHOP,
+             link: booking.LINKHOP || '',
+             room: booking.DIADIEM || '',
+             status: booking.TRANGTHAI
+           };
+        });
+
+        setEvents(mappedEvents);
+      } catch (error) {
+        console.error("Lỗi lấy lịch dạy:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedule();
   }, []);
 
-  // --- 2. CALENDAR UTILS ---
   const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   
   const getFirstDayOfMonth = (date) => {
     const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    return day === 0 ? 6 : day - 1; // Chuyển CN (0) thành index 6, T2 là 0
+    return day === 0 ? 6 : day - 1; 
   };
 
   const getStartOfWeek = (date) => {
     const d = new Date(date);
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is sunday
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
   };
 
@@ -49,7 +84,6 @@ const TutorSchedulePage = () => {
     return result;
   };
 
-  // --- 3. NAVIGATION LOGIC ---
   const handlePrev = () => {
     if (viewMode === 'month') {
       setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
@@ -66,36 +100,17 @@ const TutorSchedulePage = () => {
     }
   };
 
-  const handleToday = () => {
-    setCurrentDate(new Date());
-  };
+  const handleToday = () => setCurrentDate(new Date());
 
-  // --- 4. EVENT FILTERING ---
   const getEventsForDay = (dateObj) => {
-    // dateObj là object Date
-    // Format YYYY-MM-DD local để so sánh với data trong localStorage
-    // Lưu ý: data lưu dạng '2025-11-25', cần format dateObj tương tự
     const year = dateObj.getFullYear();
-    const month =String(dateObj.getMonth() + 1).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
     const dateKey = `${year}-${month}-${day}`;
-
     return events.filter(e => e.date === dateKey);
   };
 
-  // --- 5. MODAL HANDLERS ---
   const handleDayClick = (dateObj) => {
-    setSelectedDate(dateObj);
-    setIsModalOpen(true);
-  };
-
-  const handleEventClick = (e, event) => {
-    e.stopPropagation();
-    // Logic mở chi tiết 1 sự kiện cụ thể, ở đây ta tái sử dụng modal ngày
-    // nhưng có thể cải tiến để highlight sự kiện đó.
-    // Tạm thời mở modal ngày chứa sự kiện đó.
-    const [y, m, d] = event.date.split('-');
-    const dateObj = new Date(y, m - 1, d);
     setSelectedDate(dateObj);
     setIsModalOpen(true);
   };
@@ -105,12 +120,9 @@ const TutorSchedulePage = () => {
     setSelectedDate(null);
   };
 
-  // --- 6. RENDERERS ---
-
-  // Header cho Grid (T2 -> CN)
   const renderWeekHeader = () => (
     <div className="calendar-header-row">
-      {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'].map(day => (
+      {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(day => (
         <div key={day} className="cal-weekday">{day}</div>
       ))}
     </div>
@@ -131,22 +143,19 @@ const TutorSchedulePage = () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dayEvents = getEventsForDay(dateObj);
+      const hasEvent = dayEvents.length > 0; // [FIX] Chỉ cần kiểm tra có event hay không
       const isToday = new Date().toDateString() === dateObj.toDateString();
 
       grid.push(
         <div key={day} className={`calendar-day ${isToday ? 'is-today' : ''}`} onClick={() => handleDayClick(dateObj)}>
           <div className="day-number">{day}</div>
-          <div className="day-events">
-            {dayEvents.slice(0, 3).map((ev, idx) => (
-              <div key={idx} className={`event-pill status-${ev.status === 'Đã hủy' ? 'failed' : 'active'}`} onClick={(e) => handleEventClick(e, ev)}>
-                {ev.subject}
-              </div>
-            ))}
-            {dayEvents.length > 3 && <div className="event-more">+{dayEvents.length - 3} nữa</div>}
-          </div>
+          
+          {/* [FIX] Render chấm đỏ đơn giản, không dùng map pills để tránh vỡ layout */}
+          {hasEvent && <div className="meeting-dot"></div>}
         </div>
       );
     }
+    
     // Empty slots cuối
     const remaining = totalSlots - (startDayIndex + daysInMonth);
     for (let i = 0; i < remaining; i++) {
@@ -177,9 +186,9 @@ const TutorSchedulePage = () => {
                </div>
                <div className="day-events-stack">
                  {dayEvents.map((ev, eIdx) => (
-                    <div key={eIdx} className={`event-card status-${ev.status === 'Đã hủy' ? 'failed' : 'active'}`} onClick={(e) => handleEventClick(e, ev)}>
+                    <div key={eIdx} className={`event-card status-${ev.status === 'Đã hủy' ? 'failed' : 'active'}`}>
                       <div className="ev-time">{ev.start} - {ev.end}</div>
-                      <div className="ev-title">{ev.className}</div>
+                      <div className="ev-title">{ev.subject}</div>
                       <div className="ev-sub">{ev.type}</div>
                     </div>
                  ))}
@@ -191,60 +200,6 @@ const TutorSchedulePage = () => {
     );
   };
 
-  // --- RENDER MODAL CONTENT ---
-  const renderModalContent = () => {
-    if (!selectedDate) return null;
-    const dayEvents = getEventsForDay(selectedDate);
-
-    return (
-      <div className="modal-overlay" onClick={closeModal}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h3>Lịch dạy ngày {selectedDate.toLocaleDateString('vi-VN')}</h3>
-            <button className="btn-close" onClick={closeModal}><FiX /></button>
-          </div>
-          <div className="modal-body">
-            {dayEvents.length === 0 ? (
-              <div className="empty-state">
-                <p>Không có buổi dạy nào trong ngày này.</p>
-                <div style={{marginTop: '10px', color: '#6b7280', fontSize: '0.9rem'}}>
-                  Vui lòng qua trang "Quản lý Slots" để thêm lịch.
-                </div>
-              </div>
-            ) : (
-              <div className="event-list">
-                {dayEvents.map(ev => (
-                  <div key={ev.id} className="event-item-detail">
-                    <div className={`event-color-strip ${ev.status === 'Đã hủy' ? 'strip-red' : 'strip-blue'}`}></div>
-                    <div className="event-info">
-                      <h4>{ev.className}</h4>
-                      <div className="event-sub-title">Môn: {ev.subject}</div>
-                      <div className="event-meta">
-                        <span><FiClock /> {ev.start} - {ev.end}</span>
-                        <span><FiUsers /> {ev.registered}/{ev.max} HV</span>
-                      </div>
-                      <div className="event-meta">
-                        {ev.type === 'Online' ? (
-                          <span><FiMonitor /> Online • <a href={ev.link} target="_blank" rel="noreferrer">Link</a></span>
-                        ) : (
-                          <span><FiMapPin /> Offline • {ev.room}</span>
-                        )}
-                      </div>
-                      <div className={`status-badge ${ev.status === 'Đã hủy' ? 'st-failed' : 'st-success'}`}>
-                        {ev.status}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Helper text header
   const getHeaderText = () => {
     if (viewMode === 'month') {
       return `Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
@@ -257,7 +212,6 @@ const TutorSchedulePage = () => {
 
   return (
     <div className="dashboard-page-container">
-      {/* SIDEBAR */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-logo">
           <img src={dashboardPreview} alt="Logo" />
@@ -276,13 +230,7 @@ const TutorSchedulePage = () => {
           <h1 className="header-title">Lịch dạy của tôi</h1>
           <div className="header-search-wrapper" style={{marginLeft: '2rem'}}>
             <div className="header-search">
-              <FiSearch />
-              <input 
-                type="text" 
-                placeholder="Tìm lịch..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+               <FiSearch /><input type="text" placeholder="Tìm lịch..." />
             </div>
           </div>
           <div className="header-actions">
@@ -290,7 +238,7 @@ const TutorSchedulePage = () => {
             <button className="btn-icon"><FiBell /></button>
             <div className="user-profile">
               <img src="https://via.placeholder.com/40" alt="Avatar" />
-              <div className="user-info"><span>Jane Doe</span><small>Giảng viên</small></div>
+              <div className="user-info"><span>Giảng viên</span></div>
             </div>
           </div>
         </header>
@@ -305,26 +253,61 @@ const TutorSchedulePage = () => {
             <div className="cal-actions">
               <button className="btn-today" onClick={handleToday}>Hôm nay</button>
               <div className="view-mode">
-                <button 
-                  className={viewMode === 'month' ? 'active' : ''} 
-                  onClick={() => setViewMode('month')}
-                >Tháng</button>
-                <button 
-                  className={viewMode === 'week' ? 'active' : ''} 
-                  onClick={() => setViewMode('week')}
-                >Tuần</button>
+                <button className={viewMode === 'month' ? 'active' : ''} onClick={() => setViewMode('month')}>Tháng</button>
+                <button className={viewMode === 'week' ? 'active' : ''} onClick={() => setViewMode('week')}>Tuần</button>
               </div>
             </div>
           </div>
 
           <div className="calendar-container">
             {renderWeekHeader()}
-            {viewMode === 'month' ? renderMonthView() : renderWeekView()}
+            {loading ? <div className="loading-state">Đang tải lịch...</div> : (
+               viewMode === 'month' ? renderMonthView() : renderWeekView()
+            )}
           </div>
         </main>
       </div>
 
-      {isModalOpen && renderModalContent()}
+      {isModalOpen && selectedDate && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{selectedDate.toLocaleDateString('vi-VN')}</h3>
+              <button className="btn-close" onClick={closeModal}><FiX /></button>
+            </div>
+            <div className="modal-body">
+              {getEventsForDay(selectedDate).length === 0 ? (
+                <div className="empty-state">
+                  <p>Không có buổi dạy nào trong ngày này.</p>
+                </div>
+              ) : (
+                <div className="event-list">
+                  {getEventsForDay(selectedDate).map(ev => (
+                    <div key={ev.id} className="event-item-detail">
+                      <div className="event-info">
+                        <h4>{ev.subject}</h4>
+                        <div className="event-meta">
+                          <span><FiClock /> {ev.start}</span>
+                        </div>
+                        <div className="event-meta">
+                          {ev.type === 'Online' ? (
+                            <span>
+                                <FiVideo /> Online 
+                                {ev.link && <a href={ev.link} target="_blank" rel="noreferrer" style={{marginLeft:5}}>Vào lớp</a>}
+                            </span>
+                          ) : (
+                            <span><FiMapPin /> {ev.room}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

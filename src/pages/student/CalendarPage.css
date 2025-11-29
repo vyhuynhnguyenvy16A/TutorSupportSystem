@@ -160,13 +160,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: #0056b3; /* Màu xanh Bách Khoa */
+    background-color: #002792; 
     color: white;
 }
 
 .modal-header h3 {
     margin: 0;
     font-size: 1.1rem;
+    color: #fff;
 }
 
 .close-btn {
@@ -191,12 +192,14 @@
     padding: 0;
     margin: 0;
     display: flex;
+    flex-direction: column;
+    width: 100%;
     justify-content: center;
 }
 
 .booking-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 20px;
     padding: 12px;
     border-bottom: 1px solid #eee;

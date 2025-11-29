@@ -1,8 +1,9 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh; /* Chiều cao tối thiểu bằng 100% chiều cao màn hình */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  isolation: isolate; /* Tạo stacking context mới để tránh lỗi z-index lạ */
 }
 
 .logo {

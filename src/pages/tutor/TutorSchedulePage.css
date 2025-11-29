@@ -46,63 +46,70 @@
 
 /* MONTH VIEW */
 .calendar-body-grid { display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; overflow-y: auto; }
-.calendar-body-grid.month-view { grid-auto-rows: minmax(120px, 1fr); }
+/* [FIX] Giảm chiều cao tối thiểu để giống student calendar hơn, hoặc giữ nguyên nhưng căn giữa */
+.calendar-body-grid.month-view { grid-auto-rows: minmax(80px, 1fr); } 
 
-.calendar-day { border-right: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; padding: 0.5rem; cursor: pointer; transition: background 0.1s; display: flex; flex-direction: column; gap: 4px; }
+/* [FIX] Layout cho ô ngày: Căn giữa, Position Relative để chấm đỏ không đẩy số ngày */
+.calendar-day { 
+  border-right: 1px solid #f3f4f6; 
+  border-bottom: 1px solid #f3f4f6; 
+  padding: 0.5rem; 
+  cursor: pointer; 
+  transition: background 0.1s; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; /* Căn giữa ngang */
+  justify-content: flex-start; /* Số ngày luôn ở trên */
+  position: relative; /* Quan trọng để neo chấm đỏ */
+}
+
 .calendar-day:hover { background-color: #f9fafb; }
 .calendar-day.empty { background-color: #fcfcfc; cursor: default; }
+
+/* Style ngày hôm nay */
 .calendar-day.is-today { background-color: #f0fdf4; }
-.calendar-day.is-today .day-number, .calendar-day.is-today .day-num { background: #10b981; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.calendar-day.is-today .day-number, .calendar-day.is-today .day-num { 
+  background: #10b981; 
+  color: white; 
+  border-radius: 50%; 
+}
 
-.day-number { font-weight: 500; color: #374151; font-size: 0.9rem; margin-bottom: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+/* Số ngày */
+.day-number { 
+  font-weight: 500; 
+  color: #374151; 
+  font-size: 0.9rem; 
+  margin-bottom: 0; /* Bỏ margin bottom để tránh lệch */
+  width: 28px; 
+  height: 28px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 1;
+}
 
-/* PILLS (MONTH VIEW) */
-.event-pill { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; margin-bottom: 2px; cursor: pointer; }
-.status-active { background-color: #eef2ff; color: #4f46e5; border-left: 2px solid #4f46e5; }
-.status-failed { background-color: #fef2f2; color: #ef4444; border-left: 2px solid #ef4444; text-decoration: line-through; opacity: 0.7; }
-.event-more { font-size: 0.7rem; color: #6b7280; padding-left: 4px; }
+/* [FIX] Chấm đỏ: Absolute position để không đẩy số ngày */
+.meeting-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  position: absolute;
+  bottom: 10px; /* Neo ở đáy ô */
+  left: 50%;
+  transform: translateX(-50%); /* Căn giữa tuyệt đối */
+}
 
 /* WEEK VIEW CUSTOM */
-.calendar-body-grid.week-view {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  flex: 1;
-  /* Columns fill height */
-  height: 100%;
-}
-.week-col {
-  height: 100%;
-  min-height: 400px;
-  border-right: 1px solid #e5e7eb;
-  padding: 0; /* Reset padding to handle inner logic */
-}
-.day-header-week {
-  padding: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
+.calendar-body-grid.week-view { display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; height: 100%; }
+.week-col { height: 100%; min-height: 400px; border-right: 1px solid #e5e7eb; padding: 0; }
+.day-header-week { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
 .day-name { font-size: 0.8rem; color: #6b7280; text-transform: uppercase; font-weight: 600; }
 .day-num { font-size: 1.2rem; font-weight: 600; color: #111827; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-
-.day-events-stack {
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+.day-events-stack { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
 
 /* Card in Week View */
-.event-card {
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
+.event-card { padding: 0.5rem; border-radius: 6px; border: 1px solid transparent; cursor: pointer; transition: transform 0.1s; }
 .event-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 .event-card.status-active { background: #eef2ff; border-color: #c7d2fe; }
 .event-card.status-failed { background: #fef2f2; border-color: #fecaca; }
@@ -121,14 +128,7 @@
 .modal-body { padding: 1.25rem; max-height: 60vh; overflow-y: auto; }
 .empty-state { text-align: center; color: #6b7280; padding: 1rem 0; }
 .event-item-detail { display: flex; background: #f9fafb; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
-.event-color-strip { width: 6px; flex-shrink: 0; }
-.strip-blue { background: #4f46e5; }
-.strip-red { background: #ef4444; }
 .event-info { padding: 1rem; flex: 1; }
 .event-info h4 { margin: 0; font-size: 1rem; color: #111827; }
-.event-sub-title { font-size: 0.85rem; color: #4f46e5; font-weight: 500; margin-bottom: 0.5rem; }
 .event-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: #4b5563; margin-bottom: 0.25rem; }
 .event-meta span { display: flex; align-items: center; gap: 0.4rem; }
-.status-badge { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
-.st-success { background: #d1fae5; color: #059669; }
-.st-failed { background: #fee2e2; color: #dc2626; }

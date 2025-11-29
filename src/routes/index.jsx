@@ -6,7 +6,6 @@ import RegisterPage from '../pages/RegisterPage/RegisterPage.jsx';
 // Đảm bảo các đường dẫn import này là CHÍNH XÁC
 import HomePage from '../pages/user_homepage/HomePage.jsx';
 import LoginPage from '../pages/Login/LoginPage.jsx';
-import ForgotPasswordPage from '../pages/ForgotPassword.jsx';
 // (Import các trang khác nếu có, ví dụ: RegisterPage)
 import SettingsPage from '../pages/student/SettingsPage.jsx';
 import OverviewPage from '../pages/student/OverviewPage.jsx';
@@ -30,7 +29,6 @@ const AppRoutes = () => {
       */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* <-- THÊM MỚI: Thêm các route khác cho sidebar --> */}
       <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>

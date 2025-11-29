@@ -1,24 +1,19 @@
 /* src/Components/Layout/Hero.css */
 
-/* --- 1. Container chính (Hero Section) --- */
+
 .hero-container {
   display: flex;
-  flex-direction: column; /* Sắp xếp các mục theo chiều dọc */
-  align-items: center; /* Căn giữa theo chiều ngang */
+  flex-direction: column; 
+  align-items: center; 
   text-align: center;
   
-  max-width: 900px; /* Giới hạn chiều rộng, tránh bị dãn quá */
-  margin: 0 auto; /* Căn giữa container trên trang */
-  padding: 5rem 2rem; /* Khoảng đệm trên/dưới và trái/phải */
+  width: 100%; 
+  margin: 0 auto;
+  padding: 0;
 
-  /* Màu nền off-white như trong ảnh */
   background-color: #fdfcf9; 
 
-  /* Lưu ý: Các hình trang trí ở góc (đỏ, vàng, xanh, hồng) 
-    thường được thêm vào bằng thẻ <img> hoặc SVG 
-    và định vị 'absolute'. Chúng ta sẽ bỏ qua chúng
-    để tập trung vào layout chính.
-  */
+
 }
 
 /* --- 2. Social Proof (Trusted by...) --- */
@@ -31,114 +26,13 @@
 }
 
 .avatars {
-  /* (Bạn sẽ cần style cho các avatar xếp chồng ở đây) */
   display: flex;
+  width: 100%;
+  height: auto;
 }
 
-.proof-text {
-  text-align: left; /* Căn trái cho block text này */
-}
-
-.proof-text p {
-  margin: 0;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.proof-text span {
-  font-size: 0.85rem;
-  color: #555;
-  margin-right: 0.75rem; /* Khoảng cách giữa Rating và Reviews */
-}
-
-/* --- 3. Tiêu đề chính (Headline) --- */
-.hero-headline {
-  font-size: 3.8rem; /* Rất lớn */
-  font-weight: 800; /* Rất đậm */
-  color: #111;
-  line-height: 1.2;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-}
-
-/* --- 4. Tiêu đề phụ (Sub-headline) --- */
-.hero-subheadline {
-  font-size: 1.125rem; /* 18px */
-  color: #444;
-  line-height: 1.6;
-  max-width: 650px; /* Giới hạn chiều rộng cho dễ đọc */
-  margin: 0 auto 2.5rem auto; /* Căn giữa và tạo khoảng cách bên dưới */
-}
-
-/* --- 5. Khu vực các nút bấm (CTA) --- */
-.hero-cta-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem; /* Khoảng cách giữa 2 nút */
-}
-
-/* Style chung cho 2 nút bấm.
-  Nếu bạn có file App.css, bạn nên đặt style nút 
-  chung ở đó.
-*/
-.btn-primary-green,
-.btn-secondary-white {
-  padding: 0.85rem 1.75rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-/* Nút "Start Learning" màu xanh */
-.btn-primary-green {
-  background-color: #059669; /* Màu xanh lá cây */
-  color: white;
-}
-.btn-primary-green:hover {
-  background-color: #047857;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Nút "Explore Lessons" màu trắng */
-.btn-secondary-white {
-  background-color: #ffffff;
-  color: #333;
-  border-color: #ddd; /* Viền xám nhạt */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ */
-}
-.btn-secondary-white:hover {
-  border-color: #bbb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* --- 6. Responsive cho mobile --- */
-@media (max-width: 768px) {
-  .hero-container {
-    padding: 3rem 1rem; /* Giảm padding trên mobile */
-  }
-
-  .hero-headline {
-    font-size: 2.5rem; /* Thu nhỏ tiêu đề */
-  }
-
-  .hero-subheadline {
-    font-size: 1rem;
-  }
-
-  .hero-cta-buttons {
-    flex-direction: column; /* Xếp chồng 2 nút */
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .btn-primary-green,
-  .btn-secondary-white {
-    width: 100%; /* Cho 2 nút rộng hết cỡ */
-  }
+.avatars img{
+  width: 100%;
+  height: auto;
+  background-size: contain;
 }

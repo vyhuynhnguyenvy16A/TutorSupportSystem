@@ -70,3 +70,8 @@ body, html {
 .login-form button:hover {
   background-color: #0056b3;
 }
+
+#root{
+  width: 100%;
+  height: auto;
+}

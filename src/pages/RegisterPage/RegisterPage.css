@@ -1,108 +1,82 @@
 /* src/pages/RegisterPage/RegisterPage.css */
 
 /* --- Cấu trúc tổng thể --- */
-.login-page-container {
+.register-page-container {
   display: flex;
   width: 100%;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
-}
-
-/* --- CỘT PHẢI (PROMO) --- */
-.login-promo-section {
-  flex: 1;
-  background-color: #2b3a6e;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 4rem;
-  box-sizing: border-box;
-}
-
-.dashboard-preview-img {
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-}
-
-/* --- CỘT TRÁI (FORM) --- */
-.login-form-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  background-color: #ffffff;
-  box-sizing: border-box;
-}
-
-.login-form-wrapper {
-  width: 100%;
-  max-width: 420px;
-}
-
-/* --- Logo & Tiêu đề --- */
-.login-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.5rem;
-}
-
-.login-subtitle {
-  color: #6b7280;
-  margin-bottom: 2rem;
-  font-size: 1rem;
-}
-
-/* --- ROLE SELECTION STYLES --- */
-.role-selection-group {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.role-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  background-color: #ffffff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #374151;
-}
-
-.role-btn:hover {
-  border-color: #9ca3af;
   background-color: #f9fafb;
 }
 
-/* Trạng thái Active cho Role */
-.role-btn.active {
-  border-color: #4f46e5; /* Màu chủ đạo */
-  background-color: #eef2ff; /* Màu nền nhạt chủ đạo */
-  color: #4f46e5;
+/* --- CỘT TRÁI (FORM) - CHIẾM 100% --- */
+.register-form-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  padding: 0;
+  overflow-y: auto;
+  position: relative;
 }
 
-.role-icon {
-  font-size: 1.2rem;
+.register-form-wrapper {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
 }
 
-/* --- Form elements --- */
-.form-group {
+/* Căn giữa nội dung form */
+.register-content {
+  max-width: 600px; 
+  margin: 0 auto;   
+  padding: 0 2rem 4rem 2rem; 
+}
+
+/* --- LOGO BANNER (XANH DƯƠNG) --- */
+.register-logo {
+  width: 100%;
+  background-color: #002792;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.register-logo img {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+/* --- TYPOGRAPHY --- */
+.register-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.register-subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* --- FORM ELEMENTS --- */
+.register-form-group {
   margin-bottom: 1.25rem;
+  width: 100%;
 }
 
-.form-group label {
+.register-form-group label {
   display: block;
   font-size: 0.9rem;
   font-weight: 500;
@@ -110,7 +84,9 @@
   margin-bottom: 0.4rem;
 }
 
-.form-group input {
+/* Input fields với kích thước đồng nhất */
+.register-form-group input,
+.register-form-group select {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
@@ -119,27 +95,46 @@
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s;
+  font-family: 'Inter', sans-serif;
 }
 
-.form-group input:focus {
+.register-form-group input:focus,
+.register-form-group select:focus {
   border-color: #4f46e5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-/* --- Xử lý lỗi input --- */
-.form-group input.input-error {
-  border-color: #ef4444;
+.register-form-group input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Error States */
+.input-error {
+  border-color: #ef4444 !important;
 }
 
 .error-text {
   color: #ef4444;
   font-size: 0.85rem;
   margin-top: 0.4rem;
+  display: block;
 }
 
-/* --- Icon ẩn/hiện password --- */
+.api-error {
+  text-align: center;
+  color: #ef4444;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Password Toggle */
 .password-wrapper {
   position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 2.5rem;
 }
 
 .password-toggle-icon {
@@ -153,16 +148,34 @@
   align-items: center;
 }
 
-/* --- Terms text --- */
-.form-options-register {
-  margin-bottom: 1.5rem;
-  font-size: 0.85rem;
-  color: #6b7280;
-  text-align: center;
+/* --- ROW LAYOUTS (2 cột hoặc 3 cột) --- */
+.register-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
 }
 
-/* --- Nút Sign Up --- */
-.btn-login {
+.register-row .register-form-group {
+  flex: 1;
+}
+
+/* Row 3 cột: Ngày sinh (rộng hơn) + Giới tính + Năm học */
+.register-row-three {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.register-row-three .register-date {
+  flex: 2; /* Ngày sinh chiếm 2 phần */
+}
+
+.register-row-three .register-select {
+  flex: 1; /* Giới tính và Năm học mỗi cái 1 phần */
+}
+
+/* --- BUTTONS --- */
+.btn-register {
   width: 100%;
   padding: 0.85rem;
   background-color: #4f46e5;
@@ -173,65 +186,24 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-top: 1.5rem;
 }
 
-.btn-login:hover {
+.btn-register:hover {
   background-color: #4338ca;
 }
 
-/* --- Social Login --- */
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 1.5rem 0;
-  color: #9ca3af;
-  font-size: 0.9rem;
+.btn-register:disabled {
+  background-color: #a5a6f6;
+  cursor: not-allowed;
 }
 
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.divider::before { margin-right: 0.75rem; }
-.divider::after { margin-left: 0.75rem; }
-
-.social-login-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.btn-social {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  background-color: white;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-social:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-}
-
-/* --- Link Đăng nhập --- */
+/* --- LINKS --- */
 .register-link {
   text-align: center;
   font-size: 0.95rem;
   color: #6b7280;
+  margin-top: 1.5rem;
 }
 
 .register-link a {
@@ -244,15 +216,22 @@
   text-decoration: underline;
 }
 
-/* --- Responsive --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
-  .login-page-container {
+  .register-content {
+    padding: 0 1.5rem 2rem 1.5rem;
+    max-width: 100%;
+  }
+
+  /* Stack các input thành 1 cột trên mobile */
+  .register-row,
+  .register-row-three {
     flex-direction: column;
+    gap: 0;
   }
-  .login-promo-section {
-    display: none;
-  }
-  .login-form-section {
-    padding: 1.5rem;
+
+  .register-row .register-form-group,
+  .register-row-three .register-form-group {
+    flex: 1;
   }
 }
