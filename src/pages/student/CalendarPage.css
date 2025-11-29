@@ -121,3 +121,130 @@
 .btn-find-people:hover {
   background-color: #e5e7eb;
 }
+
+.calendar-day {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f0f4ff;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ đen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #0056b3; /* Màu xanh Bách Khoa */
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Danh sách Booking */
+.booking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.booking-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.booking-item:last-child {
+    border-bottom: none;
+}
+
+.booking-time {
+    font-weight: bold;
+    color: #0056b3;
+    min-width: 30px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.booking-info strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.booking-info p {
+    margin: 0 0 5px 0;
+    color: #666;
+    font-size: 0.85rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    background-color: #eee;
+    color: #333;
+}
+
+.no-data {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

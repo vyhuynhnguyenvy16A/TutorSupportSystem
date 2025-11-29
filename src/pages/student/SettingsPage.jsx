@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import './SettingsPage.css'; 
-import './SchedulePage.css'; 
 import dashboardPreview from '../../assets/hcmut.png'; 
 import { 
   FiHome, FiCalendar, FiPlusSquare, FiSettings,

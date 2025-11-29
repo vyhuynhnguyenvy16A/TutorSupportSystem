@@ -7,7 +7,6 @@ import {
   FiSearch, FiBell, FiCheckCircle, FiClock, FiX
 } from 'react-icons/fi';
 import dashboardPreview from '../../assets/hcmut.png'; 
-import './SchedulePage.css'; // Dùng chung layout sidebar
 import './OverviewPage.css'; // CSS riêng cho trang này
 
 import { submitRegistration } from '../../api/studentService';

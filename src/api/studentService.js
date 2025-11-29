@@ -52,15 +52,31 @@ export const getCalendar = async (month, year) => {
   const token = localStorage.getItem('token')
   if (!token) throw new Error("No access token found")
 
-    const response = await axios.get(`${API_URL}/student/calendar`, {
-      headers:{
-        'Authorization': `Bearer ${token}`
-      },
-      params: {
-      month: month,
-      year: year
-    }
-    })
+  const response = await axios.get(`${API_URL}/student/calendar`, {
+    headers:{
+      'Authorization': `Bearer ${token}`
+    },
+    params: {
+    month: month,
+    year: year
+  }
+  })
 
-    return response.data
+  return response.data
+}
+
+export const getBookings = async (date) => {
+  const token = localStorage.getItem('token')
+  if (!token) throw new Error("No access token found")
+  
+  const response = await axios.get(`${API_URL}/student/bookings`, {
+    headers:{
+      Authorization: `Bearer ${token}`
+    },
+    params: {
+      date: date
+    }
+  })
+
+  return response.data
 }

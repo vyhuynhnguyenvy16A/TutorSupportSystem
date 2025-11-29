@@ -2,59 +2,53 @@
 
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiChevronLeft, FiChevronRight, FiUsers } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi'; // Thêm FiX cho nút đóng
 import './CalendarPage.css';
 
 import { 
-  FiHome, FiCalendar, FiPlusSquare, FiSettings,
-  FiSearch, FiPlus, FiBell 
+  FiHome, FiCalendar, FiSettings,
+  FiPlus, FiBell 
 } from 'react-icons/fi';
 import hcmutLogo from '../../assets/hcmut.png'; 
-import { getCalendar } from '../../api/studentService';
+// Import thêm getBookings
+import { getCalendar, getBookings } from '../../api/studentService.js';
 
 const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [meetings, setMeetings] = useState([]); // Chứa danh sách lịch họp từ API
+  const [meetings, setMeetings] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-    // --- 2. LOGIC LỊCH ---
+  // --- STATE MỚI CHO MODAL CHI TIẾT ---
+  const [selectedDateBookings, setSelectedDateBookings] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [selectedDateStr, setSelectedDateStr] = useState('');
+
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) -> 6 (Sat)
+    const firstDay = new Date(year, month, 1).getDay(); 
     return { daysInMonth, firstDay, year, month };
   };
 
   const { daysInMonth, firstDay, year, month } = getDaysInMonth(currentDate);
 
-  // --- 1. GỌI API ---
+  // --- 1. GỌI API LỊCH TỔNG QUÁT (GIỮ NGUYÊN) ---
   useEffect(() => {
     const fetchCalendarData = async () => {
       try {
-        console.log("Month: ", month + 1)
-        console.log("Year: ", year)
         const response = await getCalendar(month + 1, year);
-
-        console.log(response)
-        console.log(response.meta)
-        setMeetings(response.meta)
+        // Lưu ý: Kiểm tra kỹ structure response.meta hay response.data tùy vào BE trả về
+        setMeetings(response.meta || []); 
       } catch (error) {
         console.error("Không thể lấy dữ liệu lịch:", error);
-        // Dữ liệu mẫu để test nếu API chưa chạy
-        setMeetings([
-            { date: '2025-11-27', title: 'Họp đồ án' },
-            { date: '2025-11-15', title: 'Gặp GVHD' }
-        ]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchCalendarData();
   }, [month, year]);
-
-
 
   const prevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -68,42 +62,57 @@ const CalendarPage = () => {
 
   const hasMeeting = (day) => {
     const checkDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    console.log(checkDate)
     return meetings.some(meeting => {
-        return meeting.THOIGIANBATDAU.startsWith(checkDate);
+        // Đảm bảo so sánh đúng format chuỗi ngày
+        return meeting.THOIGIANBATDAU && meeting.THOIGIANBATDAU.startsWith(checkDate);
     });
   };
 
-  // Xác định ngày hôm nay để highlight
   const isToday = (day) => {
     const today = new Date();
     return day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
   };
 
+  const handleDayClick = async (day) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    setSelectedDateStr(dateStr);
+    
+    setShowModal(true);
+    setLoadingDetails(true);
+    setSelectedDateBookings([]); 
+
+    try {
+        // 3. Gọi API getBookings
+        const response = await getBookings(dateStr);
+        console.log("Chi tiết ngày:", response);
+        
+        setSelectedDateBookings(response.meta); 
+    } catch (error) {
+        console.error("Lỗi lấy chi tiết ngày:", error);
+    } finally {
+        setLoadingDetails(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedDateBookings([]);
+  }
+
   return (
     <div className="dashboard-page-container">
-      {/* --- SIDEBAR (Giữ nguyên layout) --- */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-logo">
           <img src={hcmutLogo} alt="Logo" />
           <span>Hệ thống Lịch</span>
         </div>
         <nav className="sidebar-nav">
-          <NavLink to="/app/overview" className="nav-link">
-            <FiHome /> <span>Tổng quan</span>
-          </NavLink>
-          {/* Link này đang active */}
-          
-          <NavLink to="/app/schedule" className="nav-link">
-            <FiCalendar /> <span>Lịch</span>
-          </NavLink>
-          <NavLink to="/app/settings" className="nav-link">
-            <FiSettings /> <span>Cài đặt</span>
-          </NavLink>
+          <NavLink to="/app/overview" className="nav-link"><FiHome /> <span>Tổng quan</span></NavLink>
+          <NavLink to="/app/schedule" className="nav-link active"><FiCalendar /> <span>Lịch</span></NavLink>
+          <NavLink to="/app/settings" className="nav-link"><FiSettings /> <span>Cài đặt</span></NavLink>
         </nav>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
       <div className="dashboard-main-content">
         <header className="dashboard-header">
             <h1 className="header-title">Lịch học tập</h1>
@@ -113,7 +122,7 @@ const CalendarPage = () => {
                 <div className="user-profile">
                     <img src="https://via.placeholder.com/40" alt="Avatar" />
                     <div className="user-info">
-                        <span>Darrell Steward</span>
+                        <span>Student Name</span>
                         <small>Student</small>
                     </div>
                 </div>
@@ -122,7 +131,6 @@ const CalendarPage = () => {
 
         <main className="dashboard-page-content">
             <div className="calendar-container-wrapper">
-                {/* Header Lịch (Tháng + Nút chuyển) */}
                 <div className="calendar-header">
                     <h2>Tháng {month + 1}, {year}</h2>
                     <div className="calendar-nav-buttons">
@@ -131,43 +139,74 @@ const CalendarPage = () => {
                     </div>
                 </div>
 
-                {/* Grid Lịch */}
                 <div className="calendar-grid">
-                    {/* Hàng Thứ */}
                     {daysOfWeek.map(day => (
                         <div key={day} className="calendar-day-name">{day}</div>
                     ))}
-
-                    {/* Các ô trống đầu tháng */}
                     {Array.from({ length: firstDay }).map((_, index) => (
                         <div key={`empty-${index}`} className="calendar-day empty"></div>
                     ))}
 
-                    {/* Các ngày trong tháng */}
                     {Array.from({ length: daysInMonth }).map((_, index) => {
                         const day = index + 1;
                         const meetingExists = hasMeeting(day);
                         const todayClass = isToday(day) ? 'is-today' : '';
 
                         return (
-                            <div key={day} className={`calendar-day ${todayClass}`}>
+                            <div 
+                                key={day} 
+                                onClick={() => handleDayClick(day)}
+                                className={`calendar-day ${todayClass} ${meetingExists ? 'has-meeting-cursor' : ''}`}
+                            >
                                 <span className="day-number">{day}</span>
-                                
-                                {/* CHẤM TRÒN NẾU CÓ LỊCH HỌP */}
                                 {meetingExists && <div className="meeting-dot"></div>}
                             </div>
                         );
                     })}
                 </div>
-
-                {/* Footer Lịch (Tìm người) */}
-                <div className="calendar-footer">
-                    <button className="btn-find-people">
-                        <FiUsers /> Tìm người
-                    </button>
-                </div>
             </div>
         </main>
+
+        {showModal && (
+            <div className="modal-overlay" onClick={closeModal}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-header">
+                        <h3>{selectedDateStr}</h3>
+                        <button className="close-btn" onClick={closeModal}><FiX /></button>
+                    </div>
+                    
+                    <div className="modal-body">
+                        {loadingDetails ? (
+                            <p>Đang tải dữ liệu...</p>
+                        ) : (
+                            <>
+                                {selectedDateBookings && selectedDateBookings.length > 0 ? (
+                                    <ul className="booking-list">
+                                        {selectedDateBookings.map((item, idx) => (
+                                            <li key={idx} className="booking-item">
+                                                <div className="booking-time">
+                                                    {new Date(item.THOIGIANBATDAU).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
+                                                </div>
+                                                <div className="booking-info">
+                                                    <strong>{item.TIEUDE || "Cuộc họp"}</strong>
+                                                    <p>Hinh thức: {item.LOAIHOP}</p>
+                                                    {(item.LOAIHOP === "Online") && (<p>Link họp: {item.LINKHOP}</p>)}
+                                                    {(item.LOAIHOP === "Offline") && (<p>Phòng: {item.DIADIEM}</p>)}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="no-data">
+                                        <p>Không có lịch trình nào trong ngày này.</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        )}
       </div>
     </div>
   );
