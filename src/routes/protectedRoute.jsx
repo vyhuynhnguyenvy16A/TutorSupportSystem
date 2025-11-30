@@ -15,14 +15,17 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   const userRole = user.role ? user.role.toUpperCase() : ''; 
+  console.log(userRole)
 
   if (!allowedRoles.includes(userRole)) {
     if (userRole === 'STUDENT') {
       return <Navigate to="/app/overview" replace />;
     } else if (userRole === 'TUTOR') {
       return <Navigate to="/app/tutor/overview" replace />;
+    } else if (userRole === 'ADMIN'){
+      return <Navigate to="/admin" replace />; 
     } else {
-      return <Navigate to="/" replace />; 
+      return <Navigate to="/" replace />
     }
   }
 

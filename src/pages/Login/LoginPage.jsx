@@ -74,6 +74,8 @@ const LoginPage = () => {
       navigate('/app/tutor/overview');
     } else if (role === "STUDENT") {
       navigate('/app/overview');
+    } else if (role === "ADMIN"){
+      navigate('/admin')
     }
 
     setIsSubmitting(false);
