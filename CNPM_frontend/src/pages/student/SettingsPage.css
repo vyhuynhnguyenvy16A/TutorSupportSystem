@@ -1,0 +1,117 @@
+/* src/pages/SettingsPage/SettingsPage.css */
+
+/* Lưu ý: Trang này được thiết kế để hiển thị bên trong 
+  khu vực nội dung của trang SchedulePage.
+  Chúng ta sẽ KHÔNG sao chép CSS của Sidebar/Header.
+*/
+
+/* 1. Thanh Tabs */
+.settings-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+.tab-link {
+  padding: 0.75rem 0;
+  margin-right: 2rem;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+}
+.tab-link.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+/* 2. Lưới nội dung chính */
+.settings-content-grid {
+  display: grid;
+  /* Chia 2 cột, bên trái 2/3, bên phải 1/3 */
+  grid-template-columns: 1fr; 
+  gap: 2rem;
+}
+
+/* 2.1 CỘT BÊN TRÁI */
+.profile-details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.profile-section {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.avatar-section span {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+.avatar-section img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Kiểu hiển thị text (thay cho input) */
+.form-field-row,
+.form-field-row-full {
+  margin-bottom: 1rem;
+}
+.form-field-row label,
+.form-field-row-full label {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+.field-value {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb; /* Màu nền xám nhạt */
+  font-size: 0.9rem;
+  color: #111827;
+  box-sizing: border-box;
+  min-height: 42px; /* Đảm bảo chiều cao tối thiểu */
+}
+
+
+.btn-edit, .btn-save, .btn-cancel{
+  background: transparent;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+}
+
+/* 2.2 CỘT BÊN PHẢI */
+
+.dashboard-page-content::-webkit-scrollbar{
+  display: none;
+}

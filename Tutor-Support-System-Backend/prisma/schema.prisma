@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model danhgia {
+  DANHGIAID    Int                  @id @default(autoincrement())
+  GHEPCAPID    Int
+  NGUOIDANGGIA danhgia_NGUOIDANGGIA
+  DIEMSO       Int
+  NHANXET      String?              @db.Text
+  ghepcap      ghepcap              @relation(fields: [GHEPCAPID], references: [GHEPCAPID], onDelete: Cascade, onUpdate: NoAction, map: "danhgia_ibfk_1")
+
+  @@index([GHEPCAPID], map: "GHEPCAPID")
+}
+
+model dondangky {
+  DONID             Int                          @id @default(autoincrement())
+  STUDENTID         Int
+  DOTID             Int
+  LINHVUCID         Int
+  NHUCAUHOTRO       String?                      @db.Text
+  THANHTICH         String?                      @db.Text
+  TRANGTHAICHODUYET dondangky_TRANGTHAICHODUYET? @default(Ch__Duy_t)
+  student           student                      @relation(fields: [STUDENTID], references: [STUDENTID], onDelete: Cascade, onUpdate: NoAction, map: "dondangky_ibfk_1")
+  dotdangky         dotdangky                    @relation(fields: [DOTID], references: [DOTID], onDelete: Cascade, onUpdate: NoAction, map: "dondangky_ibfk_2")
+  linhvuc           linhvuc                      @relation(fields: [LINHVUCID], references: [LINHVUCID], onDelete: Cascade, onUpdate: NoAction, map: "dondangky_ibfk_3")
+  ghepcap           ghepcap?
+
+  @@index([DOTID], map: "DOTID")
+  @@index([LINHVUCID], map: "LINHVUCID")
+  @@index([STUDENTID], map: "STUDENTID")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model dotdangky {
+  DOTID       Int                 @id @default(autoincrement())
+  TENDOT      String              @db.VarChar(255)
+  NGAYBATDAU  DateTime            @db.Date
+  NGAYKETTHUC DateTime            @db.Date
+  TRANGTHAI   dotdangky_TRANGTHAI @default(ng)
+  dondangky   dondangky[]
+}
+
+model ghepcap {
+  GHEPCAPID Int                @id @default(autoincrement())
+  DONID     Int                @unique(map: "DONID")
+  TUTORID   Int
+  TRANGTHAI ghepcap_TRANGTHAI? @default(Ch__Duy_t)
+  danhgia   danhgia[]
+  dondangky dondangky          @relation(fields: [DONID], references: [DONID], onDelete: Cascade, onUpdate: NoAction, map: "ghepcap_ibfk_1")
+  tutor     tutor              @relation(fields: [TUTORID], references: [TUTORID], onDelete: Cascade, onUpdate: NoAction, map: "ghepcap_ibfk_2")
+  lichhop   lichhop[]
+
+  @@index([TUTORID], map: "TUTORID")
+}
+
+model lichhop {
+  HOPID          Int             @id @default(autoincrement())
+  GhepCapID      Int
+  TIEUDE         String          @db.VarChar(255)
+  NOIDUNG        String?         @db.Text
+  THOIGIANBATDAU DateTime        @db.DateTime(0)
+  LINKHOP        String?         @db.VarChar(255)
+  DIADIEM        String?         @db.VarChar(255)
+  LOAIHOP        lichhop_LOAIHOP @default(Offline)
+  ghepcap        ghepcap         @relation(fields: [GhepCapID], references: [GHEPCAPID], onDelete: Cascade, onUpdate: NoAction, map: "lichhop_ibfk_1")
+
+  @@index([GhepCapID], map: "GhepCapID")
+}
+
+model linhvuc {
+  LINHVUCID     Int             @id @default(autoincrement())
+  TENLINHVUC    String          @unique(map: "TENLINHVUC") @db.VarChar(255)
+  dondangky     dondangky[]
+  tutor_linhvuc tutor_linhvuc[]
+}
+
+model student {
+  STUDENTID         Int                        @id @default(autoincrement())
+  USERID            Int                        @unique(map: "USERID")
+  MSSV              String                     @unique(map: "MSSV") @db.VarChar(10)
+  SODIENTHOAI       String                     @unique(map: "SODIENTHOAI") @db.VarChar(10)
+  NGAYSINH          DateTime?                  @db.Date
+  GIOITINH          student_GIOITINH?
+  SOCMND            String?                    @unique(map: "SOCMND") @db.VarChar(12)
+  NAMHOC            Int?
+  TRANGTHAITIMTUTOR student_TRANGTHAITIMTUTOR? @default(Ch_a_t_m____c)
+  LICHRANH_TEXT     String?                    @db.Text
+  dondangky         dondangky[]
+  user              user                       @relation(fields: [USERID], references: [USERID], onDelete: Cascade, onUpdate: NoAction, map: "student_ibfk_1")
+}
+
+model thongbao {
+  THONGBAOID Int       @id @default(autoincrement())
+  USERID     Int
+  NOIDUNG    String    @db.VarChar(255)
+  DADOC      Boolean   @default(false)
+  CREATEAT   DateTime? @default(now()) @db.Timestamp(0)
+  user       user      @relation(fields: [USERID], references: [USERID], onDelete: Cascade, onUpdate: NoAction, map: "thongbao_ibfk_1")
+
+  @@index([USERID], map: "USERID")
+}
+
+model tutor {
+  TUTORID              Int                     @id @default(autoincrement())
+  USERID               Int                     @unique(map: "USERID")
+  MASOGV               String?                 @unique(map: "MASOGV") @db.VarChar(20)
+  SODIENTHOAI          String                  @unique(map: "SODIENTHOAI") @db.VarChar(10)
+  NGAYSINH             DateTime?               @db.Date
+  GIOITINH             tutor_GIOITINH?
+  SOCMND               String?                 @unique(map: "SOCMND") @db.VarChar(20)
+  AVATAR_URL           String?                 @db.VarChar(255)
+  BOMON                String?                 @db.VarChar(255)
+  BANGCAP              String?                 @db.Text
+  TRANGTHAITHAMGIA     tutor_TRANGTHAITHAMGIA? @default(S_n_S_ng)
+  DIEMDANHGIATRUNGBINH Float?                  @default(5) @db.Float
+  LICHRANH_TEXT        String?                 @db.Text
+  ghepcap              ghepcap[]
+  user                 user                    @relation(fields: [USERID], references: [USERID], onDelete: Cascade, onUpdate: NoAction, map: "tutor_ibfk_1")
+  tutor_linhvuc        tutor_linhvuc[]
+}
+
+model tutor_linhvuc {
+  TUTORID   Int
+  LINHVUCID Int
+  tutor     tutor   @relation(fields: [TUTORID], references: [TUTORID], onDelete: Cascade, onUpdate: NoAction, map: "tutor_linhvuc_ibfk_1")
+  linhvuc   linhvuc @relation(fields: [LINHVUCID], references: [LINHVUCID], onDelete: Cascade, onUpdate: NoAction, map: "tutor_linhvuc_ibfk_2")
+
+  @@id([TUTORID, LINHVUCID])
+  @@index([LINHVUCID], map: "LINHVUCID")
+}
+
+model user {
+  USERID   Int        @id @default(autoincrement())
+  HOTEN    String     @db.VarChar(100)
+  EMAIL    String     @unique(map: "EMAIL") @db.VarChar(255)
+  Password String     @db.VarChar(255)
+  Role     user_Role
+  student  student?
+  thongbao thongbao[]
+  tutor    tutor?
+}
+
+enum danhgia_NGUOIDANGGIA {
+  STUDENT
+  TUTOR
+}
+
+enum user_Role {
+  STUDENT
+  TUTOR
+  ADMIN
+  PCTSV
+  PDT
+}
+
+enum dotdangky_TRANGTHAI {
+  ng @map("Đóng")
+  M_ @map("Mở")
+}
+
+enum dondangky_TRANGTHAICHODUYET {
+  Ch__Duy_t @map("Chờ Duyệt")
+  Duy_t     @map("Đã Duyệt")
+  T__Ch_i   @map("Từ Chối")
+}
+
+enum student_TRANGTHAITIMTUTOR {
+  t_m____c      @map("Đã tìm được")
+  Ch_a_t_m____c @map("Chưa tìm được")
+}
+
+enum tutor_TRANGTHAITHAMGIA {
+  S_n_S_ng @map("Sẵn Sàng")
+  T_m_D_ng @map("Tạm Dừng")
+}
+
+enum lichhop_LOAIHOP {
+  Online
+  Offline
+}
+
+enum ghepcap_TRANGTHAI {
+  Ch__Duy_t @map("Chờ Duyệt")
+  x_c_nh_n  @map("Đã xác nhận")
+  H_y       @map("Đã Hủy")
+}
+
+enum tutor_GIOITINH {
+  Nam
+  N_   @map("Nữ")
+  Kh_c @map("Khác")
+}
+
+enum student_GIOITINH {
+  Nam
+  N_   @map("Nữ")
+  Kh_c @map("Khác")
+}

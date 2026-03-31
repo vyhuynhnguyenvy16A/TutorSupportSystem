@@ -10,7 +10,7 @@ Tutor-Support-System (Monorepo)
 ├── Tutor-Support-System-Backend (Server/Controller/Model)
 │ ├── prisma/ # Database Schema & Migrations
 │ ├── src/controllers/ # Logic xử lý Request
-│ ├── src/models/ # Cấu trúc dữ liệu (via Prisma)
+│ ├── src/routers/ # Cấu trúc điều hướng (via Prisma)
 │ └── .env # Cấu hình Database & JWT Secret
 │
 └── CNPM_frontend (Client/View)
