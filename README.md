@@ -39,28 +39,28 @@ Hệ thống yêu cầu cài đặt Node.js (v18+) và một instance PostgreSQL
 
 cd Tutor-Support-System-Backend
 
-# Cài đặt dependencies
+Cài đặt dependencies
 
 npm install
 
-# Cấu hình file .env (DATABASE_URL="postgresql://...")
+Cấu hình file .env (DATABASE_URL="postgresql://...")
 
-# Đồng bộ Database
+Đồng bộ Database
 
 npm run db:pull
 npm run db:generate
 
-# Chạy server development
+Chạy server development
 
 npm run dev
 
 cd CNPM_frontend
 
-# Cài đặt dependencies
+Cài đặt dependencies
 
 npm install
 
-# Chạy giao diện
+Chạy giao diện
 
 npm run dev
 
