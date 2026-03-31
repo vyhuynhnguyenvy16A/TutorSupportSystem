@@ -1,0 +1,237 @@
+/* src/pages/RegisterPage/RegisterPage.css */
+
+/* --- Cấu trúc tổng thể --- */
+.register-page-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+}
+
+/* --- CỘT TRÁI (FORM) - CHIẾM 100% --- */
+.register-form-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  padding: 0;
+  overflow-y: auto;
+  position: relative;
+}
+
+.register-form-wrapper {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+/* Căn giữa nội dung form */
+.register-content {
+  max-width: 600px; 
+  margin: 0 auto;   
+  padding: 0 2rem 4rem 2rem; 
+}
+
+/* --- LOGO BANNER (XANH DƯƠNG) --- */
+.register-logo {
+  width: 100%;
+  background-color: #002792;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.register-logo img {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+/* --- TYPOGRAPHY --- */
+.register-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.register-subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* --- FORM ELEMENTS --- */
+.register-form-group {
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.register-form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+/* Input fields với kích thước đồng nhất */
+.register-form-group input,
+.register-form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.register-form-group input:focus,
+.register-form-group select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.register-form-group input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Error States */
+.input-error {
+  border-color: #ef4444 !important;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  display: block;
+}
+
+.api-error {
+  text-align: center;
+  color: #ef4444;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Password Toggle */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 2.5rem;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* --- ROW LAYOUTS (2 cột hoặc 3 cột) --- */
+.register-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.register-row .register-form-group {
+  flex: 1;
+}
+
+/* Row 3 cột: Ngày sinh (rộng hơn) + Giới tính + Năm học */
+.register-row-three {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.register-row-three .register-date {
+  flex: 2; /* Ngày sinh chiếm 2 phần */
+}
+
+.register-row-three .register-select {
+  flex: 1; /* Giới tính và Năm học mỗi cái 1 phần */
+}
+
+/* --- BUTTONS --- */
+.btn-register {
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1.5rem;
+}
+
+.btn-register:hover {
+  background-color: #4338ca;
+}
+
+.btn-register:disabled {
+  background-color: #a5a6f6;
+  cursor: not-allowed;
+}
+
+/* --- LINKS --- */
+.register-link {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-top: 1.5rem;
+}
+
+.register-link a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .register-content {
+    padding: 0 1.5rem 2rem 1.5rem;
+    max-width: 100%;
+  }
+
+  /* Stack các input thành 1 cột trên mobile */
+  .register-row,
+  .register-row-three {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .register-row .register-form-group,
+  .register-row-three .register-form-group {
+    flex: 1;
+  }
+}
